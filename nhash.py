@@ -81,14 +81,14 @@ def start_mining(algo):
 	miner_path = cfg.get(algo.upper(),'MINER_PATH')
 	miner_bin = cfg.get(algo.upper(),'MINER_BIN')
 	algo_file = algo.upper() + '.bat'
-    try:
-        os.chdir(miner_path)
-        proc = Popen(algo_file, creationflags=CREATE_NEW_CONSOLE)
-        print "[+] Successfully started mining on %s algorithm\n" %(algo)
-        sleep(3)
-        return miner_bin
-    except:
-        print "[-] ERROR starting miner"
+	try:
+		os.chdir(miner_path)
+		proc = Popen(algo_file, creationflags=CREATE_NEW_CONSOLE)
+		print "[+] Successfully started mining on %s algorithm\n" %(algo)
+		sleep(3)
+		return miner_bin
+	except:
+		print "[-] ERROR starting miner"
 
 
 def endless_miner():
@@ -108,8 +108,8 @@ def endless_miner():
 
 def main():
 	if not overclock_running():
-        start_overclock()
-    endless_miner()
+		start_overclock()
+	endless_miner()
 
 
 
