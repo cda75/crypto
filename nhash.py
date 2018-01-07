@@ -106,13 +106,16 @@ def endless_miner():
         sleep(300)
 
 
+def main():
+	if not overclock_running():
+        start_overclock()
+    endless_miner()
 
 
 
 if __name__ == "__main__":
-    if not overclock_running():
-        start_overclock()
-    endless_miner()
+	main()
+    
 
 
 
