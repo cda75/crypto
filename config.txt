@@ -1,0 +1,91 @@
+[GPU]
+GPU_NUM = 4
+MODELS = GTX1070, GTX1070, GTX1060, GTX1060
+
+[BTC]
+ADDR = 1B1oMEyYkA7fPh8M5EWCnevUXWsATN33Vv
+
+[ZCL]
+ADDR = t1e5aSUDj1vmk5GEbE4rVB9wQSvTEMtfvyy
+ALGO = EQUIHASH
+POOL = europe.equihash-hub.miningpoolhub.com:20575
+USER = cda75.zcl
+PASSWORD = x
+
+[ZEC]
+ADDR = t1Lg8CBz9G4aLLZt21xVpbXMsneFgN1Ue2j
+ALGO = EQUIHASH
+POOL = eu1-zcash.flypool.org:3333
+USER = rig1
+PASSWORD = None
+
+[XVG]
+ADDR = D929BwKkwuQUkvx4HeKY3jPphc3fsdhaYy
+ALGO = LYRA2REV2
+POOL = stratum+tcp://xvg-mine.idcray.com:10011
+USER = cda75.xvg
+PASSWORD = x
+
+[XMR]
+ADDR = 41mE7PmJzXjeyNKdomCZoVGSwbW84L5qmexZaUwoKqC4Kdqw6Ey6aTgDSZdxDiVLi5gLooAGgw6mwYfoTQE1AwktLzWF5yT
+ALGO = CRYPTONIGHT
+POOL = pool.supportxmr.com:3333
+USER = None
+PASSWORD = None
+
+[BENCHMARK]
+equihash = 1290
+cryptonight = 1700
+skunk = 91000000
+lyra2rev2 = 115000000
+blake2c = 11400000000
+neoscrypt = 2800000
+scrypt = 0
+ethash = 
+pascal = 0
+lbry = 0
+
+[EQUIHASH]
+MINER_BIN = miner.exe
+MINER_PATH = C:\Users\root\CryptoPro\ewbf
+
+[LYRA2REV2]
+MINER_BIN = ccminer-x64.exe
+MINER_PATH = C:\Users\root\CryptoPro\ccminer
+
+[CRYPTONIGHT]
+MINER_BIN = xmr-stak.exe
+MINER_PATH = C:\Users\root\CryptoPro\xmr-stak
+
+[SKUNK]
+MINER_BIN = ccminer-x64.exe
+MINER_PATH = C:\Users\root\CryptoPro\ccminer
+
+[NEOSCRYPT]
+MINER_BIN = ccminer-x64.exe
+MINER_PATH = C:\Users\root\CryptoPro\ccminer
+
+[SCRYPT]
+MINER_BIN = ccminer-x64.exe
+MINER_PATH = C:\Users\root\CryptoPro\ccminer
+
+[BLAKE2C]
+MINER_BIN = ccminer-x64.exe
+MINER_PATH = C:\Users\root\CryptoPro\ccminer
+
+[PASCAL]
+MINER_BIN = ccminer-x64.exe
+MINER_PATH = C:\Users\root\CryptoPro\ccminer
+
+[LBRY]
+MINER_BIN = ccminer-x64.exe
+MINER_PATH = C:\Users\root\CryptoPro\ccminer
+
+[ETHASH]
+MINER_BIN = EthDcrMiner64.exe
+MINER_PATH = C:\Users\root\CryptoPro\claymor
+
+
+
+
+

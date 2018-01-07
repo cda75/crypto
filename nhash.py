@@ -4,78 +4,91 @@ from datetime import datetime
 from time import sleep
 from subprocess import Popen, CREATE_NEW_CONSOLE
 import psutil
+from ConfigParser import SafeConfigParser 
 
 
-MY_ALGO = [8,9,24,28,29]
-BENCHMARK = {	"8": {"speed": 2800000},
-				"9": {"speed": 116000000},
-				"24": {"speed": 1290},
-				"28": {"speed": 11400000000},
-				"29": {"speed": 91000000}
-			}
 
-ALGO = {"8": {"algo": 8, "name": "neoscrypt", "url": "neoscrypt.eu.nicehash.com:3341", "path": "C:\\Users\\root\\CryptoPro\\ccminer", "bin": "ccminer-x64.exe"},
-    "9": {"algo": 9, "name": "lyra2rev2", "url": "lyra2rev2.eu.nicehash.com:3347", "path": "C:\\Users\\root\\CryptoPro\\ccminer", "bin": "ccminer-x64.exe"},
-    "24": {"algo": 24, "name": "equihash", "url": "equihash.eu.nicehash.com:3357", "path": "C:\\Users\\root\\CryptoPro\\ewbf", "bin": "miner.exe"},
-    "28": {"algo": 28, "name": "blake2c", "url": "blake2s.eu.nicehash.com:3361", "path": "C:\\Users\\root\\CryptoPro\\ccminer", "bin": "ccminer-x64.exe"},
-    "29": {"algo": 29, "name": "skunk", "url": "skunk.eu.nicehash.com:3362", "path": "C:\\Users\\root\\CryptoPro\\ccminer", "bin": "ccminer-x64.exe"}
-    }
-    
-API_URL = "https://api.nicehash.com/api"
+CONFIG_FILE = 'config.txt'
+NICEHASH_API_URL = "https://api.nicehash.com/api"
 payload = {'method': 'simplemultialgo.info'}
 
+OVERCLOCK_PROGRAM_BIN = "MSIAfterburner.exe"
+OVERCLOCK_PROGRAM_PATH = "C:\Program Files (x86)\MSI Afterburner"
 
-def get_best_algo():
-    best_value = 0
-    best_algo = ''
-    req = requests.get(API_URL, params=payload)
-    reqResult = req.json()['result']
-    rez =  reqResult['simplemultialgo']
-    for i in rez:
-        if i["algo"] in MY_ALGO:
-            k = str(i["algo"])
+
+
+def get_algo_speed(algo='equihash'):
+	cfg = SafeConfigParser()
+	cfg.read(CONFIG_FILE)
+	benchmark = dict(cfg.items('BENCHMARK'))
+	return int(benchmark[algo])
+
+
+def read_algo():
+	cfg = SafeConfigParser()
+	cfg.read(CONFIG_FILE)
+	algo_dict = dict(cfg.items('BENCHMARK'))
+	algo_list = []
+	for k in algo_dict:
+		algo_list.append(k)
+	return algo_list
+ 
+
+def nicehash_best_algo():
+	my_algo = read_algo()
+	best_value = 0
+	best_algo = ''
+	req = requests.get(NICEHASH_API_URL, params=payload)
+	reqResult = req.json()['result']
+	rez =  reqResult['simplemultialgo']
+	for i in rez:
+		algo_name = i['name']
+        if algo_name in my_algo:
             price = float(i["paying"])
-#            speed = x[k]['speed']
-            algo_value = price*BENCHMARK[k]["speed"]
+            algo_speed = get_algo_speed(algo_name)
+            algo_value = price*algo_speed
             if algo_value > best_value:
                 best_value = algo_value
-                best_algo = k
-    print datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M")
-    print "CURRENT BEST ALGO: ", ALGO[best_algo]['name'], "\n"
-    return ALGO[best_algo]
+                best_algo = algo_name
+	print datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M")
+	print "CURRENT BEST ALGO: ", best_algo, "\n"
+	return best_algo
 
 
-def kill_proc(name):
-    cmd_str = 'taskkill /f /im ' + name
-    os.system(cmd_str)
+def kill_process(processName):
+    cmdStr = "taskkill /f /im %s" %(processName)
+    os.system(cmdStr)
 
 
 def overclock_running():
-    name = "MSIAfterburner.exe"
     for pid in psutil.pids():
         p = psutil.Process(pid)
-        if p.name() == name:
+        if p.name() == OVERCLOCK_PROGRAM_BIN:
             return True
     return False
 
 
-def start_overclock():
-    path = "C:\Program Files (x86)\MSI Afterburner"
-    os.chdir(path)
-    Popen("MSIAfterburner.exe \s -Profile1")
+def start_overclock(profile=1):
+    os.chdir(OVERCLOCK_PROGRAM_PATH)
+    cmdStr = "%s \s -Profile%s" %(OVERCLOCK_PROGRAM_BIN, profile)
+    Popen(cmdStr)
     sleep(5)
 
 
 def start_mining(algo):
-    algo_file = str(algo["name"]).upper() + '.bat'
+	cfg = SafeConfigParser()
+	cfg.read(CONFIG_FILE)
+	miner_path = cfg.get(algo.upper(),'MINER_PATH')
+	miner_bin = cfg.get(algo.upper(),'MINER_BIN')
+	algo_file = algo.upper() + '.bat'
     try:
-        os.chdir(algo["path"])
+        os.chdir(miner_path)
         proc = Popen(algo_file, creationflags=CREATE_NEW_CONSOLE)
-        print "Successfully started mining on %s algorithm\n" %(algo['name'])
+        print "[+] Successfully started mining on %s algorithm\n" %(algo)
         sleep(3)
-        return algo['bin']
+        return miner_bin
     except:
-        print "ERROR"
+        print "[-] ERROR starting miner"
 
 
 def endless_miner():
@@ -87,7 +100,7 @@ def endless_miner():
         best_algo = get_best_algo()
         if CURRENT_ALGO != best_algo["algo"]:
             CURRENT_ALGO = best_algo["algo"]
-            kill_proc(process)
+            kill_process(process)
             sleep(3)
             process = start_mining(best_algo)
         sleep(300)
@@ -97,9 +110,13 @@ def endless_miner():
 
 
 if __name__ == "__main__":
+	print nicehash_best_algo()
+	'''
     if not overclock_running():
         start_overclock()
     endless_miner()
+    '''
+
 
 
 
