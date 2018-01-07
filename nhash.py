@@ -110,12 +110,9 @@ def endless_miner():
 
 
 if __name__ == "__main__":
-	print nicehash_best_algo()
-	'''
     if not overclock_running():
         start_overclock()
     endless_miner()
-    '''
 
 
 
