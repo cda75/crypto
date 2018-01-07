@@ -92,17 +92,17 @@ def start_mining(algo):
 
 
 def endless_miner():
-    best_algo = get_best_algo()
-    process = start_mining(best_algo)
-    CURRENT_ALGO = best_algo["algo"]
+    best_algo = nicehash_best_algo()
+    current_miner = start_mining(best_algo)
+    CURRENT_ALGO = best_algo
     sleep(60)
     while True:    
         best_algo = get_best_algo()
-        if CURRENT_ALGO != best_algo["algo"]:
-            CURRENT_ALGO = best_algo["algo"]
-            kill_process(process)
+        if CURRENT_ALGO != best_algo:
+            CURRENT_ALGO = best_algo
+            kill_process(current_miner)
             sleep(3)
-            process = start_mining(best_algo)
+            current_miner = start_mining(best_algo)
         sleep(300)
 
 
