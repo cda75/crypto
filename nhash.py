@@ -40,7 +40,7 @@ def nicehash_best_algo():
 				best_value = algo_value
 				best_algo = algo_name
 	current_time = datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
-	print "\n[%s] Current Best Algo: %s\n" %(current_time, best_algo)
+	print "\n[%s] Current Best Algo: %s" %(current_time, best_algo)
 	return best_algo
 
 
@@ -74,7 +74,7 @@ def start_mining(algo):
 	try:
 		os.chdir(miner_path)
 		proc = Popen(algo_file, creationflags=CREATE_NEW_CONSOLE)
-		print "[+] Successfully started mining on %s algorithm\n" %(algo)
+		print "[+] Successfully started mining on %s algorithm" %(algo)
 		sleep(3)
 		return miner_bin
 	except:
