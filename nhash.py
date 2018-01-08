@@ -39,8 +39,8 @@ def nicehash_best_algo():
 			if algo_value > best_value:
 				best_value = algo_value
 				best_algo = algo_name
-	print '\n',datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M")
-	print "Current Best Algo: ", best_algo, "\n"
+	current_time = datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
+	print "\n[%s] Current Best Algo: %s\n" %(current_time, best_algo)
 	return best_algo
 
 
