@@ -25,7 +25,6 @@ def nicehash_best_algo():
 	my_algo = algo_dict.keys()
 	best_value = 0
 	NICEHASH_API_URL = cfg.get('NICEHASH', 'API_URL')
-	method = cfg.get('NICEHASH', 'METHOD')
 	payload = {'method': cfg.get('NICEHASH', 'METHOD')}
 	req = requests.get(NICEHASH_API_URL, params=payload)
 	reqResult = req.json()['result']
@@ -33,9 +32,9 @@ def nicehash_best_algo():
 	for i in rez:
 		algo_name = i['name'].strip()
 		if algo_name in my_algo:
-			price = float(i["paying"])
+			algo_price = float(i["paying"])
 			algo_speed = long(algo_dict[algo_name])
-			algo_value = price*algo_speed
+			algo_value = algo_price*algo_speed
 			if algo_value > best_value:
 				best_value = algo_value
 				best_algo = algo_name
@@ -83,13 +82,10 @@ def start_mining(coin):
 		cmdStr = "%s -a %s -o %s -u %s.rig1" %(miner_bin, algo, pool_url, addr)
 	try:
 		os.chdir(miner_path)
-<<<<<<< HEAD
 		proc = Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
 		print "[+] Successfully started mining on %s algorithm\n" %(algo)
-=======
 		proc = Popen(algo_file, creationflags=CREATE_NEW_CONSOLE)
 		print "[+] Successfully started mining on %s algorithm" %(algo)
->>>>>>> f419523e00b36fe9ffcac299d849555985302d94
 		sleep(3)
 		return miner_bin
 	except:
