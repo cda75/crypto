@@ -64,16 +64,26 @@ def start_overclock(profile=1):
     sleep(5)
 
 
-def start_mining(algo):
+def start_mining(coin):
 	cfg = SafeConfigParser()
 	cFile = os.path.join(CONFIG_DIR,CONFIG_FILE)
 	cfg.read(cFile)
+	algo = cfg.get(coin, 'ALGO')
 	miner_path = cfg.get(algo.upper(),'MINER_PATH')
 	miner_bin = cfg.get(algo.upper(),'MINER_BIN')
-	algo_file = algo.upper() + '.bat'
+#	algo_file = algo.upper() + '.bat'
+	if algo == 'equihash':
+		pool_url = cfg.get(coin, 'POOL')
+		pool_user = cfg.get(coin, 'USER')
+		pool_password = cfg.get(coin, 'PASSWORD')
+		port = cfg.get(coin, 'PORT')
+		api = cfg.get('MAIN', 'IP')
+		cmdStr = "%s --server %s --user %s --pass %s --port %s --api %s --fee 0" %(miner_bin, pool_url, pool_user, pool_password, port, api)
+	else:
+		cmdStr = "%s -a %s -o %s -u %s.rig1" %(miner_bin, algo, pool_url, addr)
 	try:
 		os.chdir(miner_path)
-		proc = Popen(algo_file, creationflags=CREATE_NEW_CONSOLE)
+		proc = Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
 		print "[+] Successfully started mining on %s algorithm\n" %(algo)
 		sleep(3)
 		return miner_bin
