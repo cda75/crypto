@@ -85,7 +85,7 @@ def endless_miner():
     best_algo = nicehash_best_algo()
     current_miner = start_mining(best_algo)
     CURRENT_ALGO = best_algo
-    sleep(30)
+    sleep(60)
     while True:    
         best_algo = nicehash_best_algo()
         if CURRENT_ALGO != best_algo:
@@ -93,7 +93,7 @@ def endless_miner():
             kill_process(current_miner)
             sleep(3)
             current_miner = start_mining(best_algo)
-        sleep(100)
+        sleep(300)
 
 
 def main():
