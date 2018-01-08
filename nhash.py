@@ -7,20 +7,21 @@ import psutil
 from ConfigParser import SafeConfigParser 
 
 
-
+CONFIG_PATH = r'C:\Users\root\CryptoPro\Function'
 CONFIG_FILE = 'config.txt'
-NICEHASH_API_URL = "https://api.nicehash.com/api"
-payload = {'method': 'simplemultialgo.info'}
+#NICEHASH_API_URL = "https://api.nicehash.com/api"
+#payload = {'method': 'simplemultialgo.info'}
 
 OVERCLOCK_PROGRAM_BIN = "MSIAfterburner.exe"
 OVERCLOCK_PROGRAM_PATH = "C:\Program Files (x86)\MSI Afterburner"
 
 
-
+'''
 def get_algo_speed(algo='equihash'):
 	cfg = SafeConfigParser()
 	cfg.read(CONFIG_FILE)
 	benchmark = dict(cfg.items('BENCHMARK'))
+	print benchmark
 	return int(benchmark[algo])
 
 
@@ -28,16 +29,26 @@ def read_algo():
 	cfg = SafeConfigParser()
 	cfg.read(CONFIG_FILE)
 	algo_dict = dict(cfg.items('BENCHMARK'))
+	print algo_dict
 	algo_list = []
 	for k in algo_dict:
 		algo_list.append(k)
 	return algo_list
- 
+''' 
 
 def nicehash_best_algo():
-	my_algo = read_algo()
+	cfg = SafeConfigParser()
+	os.chdir(CONFIG_PATH)
+	cfg.read(CONFIG_FILE)
+	algo_dict = dict(cfg.items('BENCHMARK'))
+	my_algo = []
+	for k in algo_dict:
+		my_algo.append(k)
 	best_value = 0
 	best_algo = ''
+	NICEHASH_API_URL = cfg.get('NICEHASH', 'API_URL')
+	method = cfg.get('NICEHASH', 'METHOD')
+	payload = {'method': cfg.get('NICEHASH', 'METHOD')}
 	req = requests.get(NICEHASH_API_URL, params=payload)
 	reqResult = req.json()['result']
 	rez =  reqResult['simplemultialgo']
@@ -45,7 +56,7 @@ def nicehash_best_algo():
 		algo_name = i['name']
         if algo_name in my_algo:
             price = float(i["paying"])
-            algo_speed = get_algo_speed(algo_name)
+            algo_speed = int(algo_dict[algo_name])
             algo_value = price*algo_speed
             if algo_value > best_value:
                 best_value = algo_value
@@ -95,15 +106,15 @@ def endless_miner():
     best_algo = nicehash_best_algo()
     current_miner = start_mining(best_algo)
     CURRENT_ALGO = best_algo
-    sleep(60)
+    sleep(30)
     while True:    
-        best_algo = get_best_algo()
+        best_algo = nicehash_best_algo()
         if CURRENT_ALGO != best_algo:
             CURRENT_ALGO = best_algo
             kill_process(current_miner)
             sleep(3)
             current_miner = start_mining(best_algo)
-        sleep(300)
+        sleep(100)
 
 
 def main():

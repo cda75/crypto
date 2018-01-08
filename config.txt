@@ -2,6 +2,10 @@
 GPU_NUM = 4
 MODELS = GTX1070, GTX1070, GTX1060, GTX1060
 
+[NICEHASH]
+API_URL = https://api.nicehash.com/api
+METHOD = simplemultialgo.info
+
 [BTC]
 ADDR = 1B1oMEyYkA7fPh8M5EWCnevUXWsATN33Vv
 
