@@ -39,8 +39,8 @@ def nicehash_best_algo():
 			if algo_value > best_value:
 				best_value = algo_value
 				best_algo = algo_name
-	print '\n',datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M")
-	print "Current Best Algo: ", best_algo, "\n"
+	current_time = datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
+	print "\n[%s] Current Best Algo: %s" %(current_time, best_algo)
 	return best_algo
 
 
@@ -83,8 +83,13 @@ def start_mining(coin):
 		cmdStr = "%s -a %s -o %s -u %s.rig1" %(miner_bin, algo, pool_url, addr)
 	try:
 		os.chdir(miner_path)
+<<<<<<< HEAD
 		proc = Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
 		print "[+] Successfully started mining on %s algorithm\n" %(algo)
+=======
+		proc = Popen(algo_file, creationflags=CREATE_NEW_CONSOLE)
+		print "[+] Successfully started mining on %s algorithm" %(algo)
+>>>>>>> f419523e00b36fe9ffcac299d849555985302d94
 		sleep(3)
 		return miner_bin
 	except:
@@ -95,7 +100,7 @@ def endless_miner():
     best_algo = nicehash_best_algo()
     current_miner = start_mining(best_algo)
     CURRENT_ALGO = best_algo
-    sleep(30)
+    sleep(60)
     while True:    
         best_algo = nicehash_best_algo()
         if CURRENT_ALGO != best_algo:
@@ -103,7 +108,7 @@ def endless_miner():
             kill_process(current_miner)
             sleep(3)
             current_miner = start_mining(best_algo)
-        sleep(100)
+        sleep(300)
 
 
 def main():
