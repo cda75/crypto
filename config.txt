@@ -45,7 +45,7 @@ lyra2rev2 = 115000000
 blake2c = 11400000000
 neoscrypt = 2800000
 scrypt = 0
-ethash = 
+ethash = 0
 pascal = 0
 lbry = 0
 

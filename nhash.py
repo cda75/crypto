@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import requests
 import os
 from datetime import datetime
@@ -7,45 +9,21 @@ import psutil
 from ConfigParser import SafeConfigParser 
 
 
-CONFIG_PATH = r'C:\Users\root\CryptoPro\Function'
-CONFIG_FILE = 'config.txt'
-#NICEHASH_API_URL = "https://api.nicehash.com/api"
-#payload = {'method': 'simplemultialgo.info'}
+CONFIG_DIR = r"C:\Users\root\CryptoPro\Function"
+CONFIG_FILE = "config.txt"
 
 OVERCLOCK_PROGRAM_BIN = "MSIAfterburner.exe"
 OVERCLOCK_PROGRAM_PATH = "C:\Program Files (x86)\MSI Afterburner"
 
 
-'''
-def get_algo_speed(algo='equihash'):
-	cfg = SafeConfigParser()
-	cfg.read(CONFIG_FILE)
-	benchmark = dict(cfg.items('BENCHMARK'))
-	print benchmark
-	return int(benchmark[algo])
-
-
-def read_algo():
-	cfg = SafeConfigParser()
-	cfg.read(CONFIG_FILE)
-	algo_dict = dict(cfg.items('BENCHMARK'))
-	print algo_dict
-	algo_list = []
-	for k in algo_dict:
-		algo_list.append(k)
-	return algo_list
-''' 
 
 def nicehash_best_algo():
 	cfg = SafeConfigParser()
-	os.chdir(CONFIG_PATH)
-	cfg.read(CONFIG_FILE)
+	cFile = os.path.join(CONFIG_DIR,CONFIG_FILE)
+	cfg.read(cFile)
 	algo_dict = dict(cfg.items('BENCHMARK'))
-	my_algo = []
-	for k in algo_dict:
-		my_algo.append(k)
+	my_algo = algo_dict.keys()
 	best_value = 0
-	best_algo = ''
 	NICEHASH_API_URL = cfg.get('NICEHASH', 'API_URL')
 	method = cfg.get('NICEHASH', 'METHOD')
 	payload = {'method': cfg.get('NICEHASH', 'METHOD')}
@@ -53,16 +31,16 @@ def nicehash_best_algo():
 	reqResult = req.json()['result']
 	rez =  reqResult['simplemultialgo']
 	for i in rez:
-		algo_name = i['name']
-        if algo_name in my_algo:
-            price = float(i["paying"])
-            algo_speed = int(algo_dict[algo_name])
-            algo_value = price*algo_speed
-            if algo_value > best_value:
-                best_value = algo_value
-                best_algo = algo_name
-	print datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M")
-	print "CURRENT BEST ALGO: ", best_algo, "\n"
+		algo_name = i['name'].strip()
+		if algo_name in my_algo:
+			price = float(i["paying"])
+			algo_speed = long(algo_dict[algo_name])
+			algo_value = price*algo_speed
+			if algo_value > best_value:
+				best_value = algo_value
+				best_algo = algo_name
+	print '\n',datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M")
+	print "Current Best Algo: ", best_algo, "\n"
 	return best_algo
 
 
@@ -88,7 +66,8 @@ def start_overclock(profile=1):
 
 def start_mining(algo):
 	cfg = SafeConfigParser()
-	cfg.read(CONFIG_FILE)
+	cFile = os.path.join(CONFIG_DIR,CONFIG_FILE)
+	cfg.read(cFile)
 	miner_path = cfg.get(algo.upper(),'MINER_PATH')
 	miner_bin = cfg.get(algo.upper(),'MINER_BIN')
 	algo_file = algo.upper() + '.bat'
