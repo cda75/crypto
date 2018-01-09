@@ -109,7 +109,24 @@ def endless_miner():
         sleep(100)
 
 
-def whattomine_best_algos():
+def whattomine_best_coin():
+	'''
+	Calculate the best profit for coin from mining pool
+	H 		= 	your equipment hashrate
+	NH 		= 	pool total hashrate
+	BpH 	= 	block per hour from pool statistic
+	D 		=	network difficulty
+	BR 		=	block reward
+	P 		=	price in USD
+
+	Reward in hour (in coins) = H*BpH*BR/NH
+	Reward in hour (in USD$) = (Reward in coins) * P
+	API_URL = https://api-zcash.flypool.org/poolStats
+	NH = data['poolstats']['hashRate']
+	BpH = data['poolstats']['blocksPerHour']
+	P = data['price']['usd']
+
+	'''
 	API_URL = 'http://whattomine.com/coins.json'
 	req = requests.get(API_URL)
 	reqResult = req.json()['coins']
@@ -131,6 +148,39 @@ def whattomine_best_algos():
 	print R
 
 
+def get_flypool_profit(coin, hashrate):
+	FLYPOOL_API_URL = "https://api-zcash.flypool.org/poolStats"
+	req = requests.get(FLYPOOL_API_URL)
+	data = req.json()['data']
+	PF = 0.99
+	NH = data['poolStats']['hashRate']
+	BpH = data['poolStats']['blocksPerHour']
+	profit = get_coin_profit(coin, hashrate, NH, BpH)
+	return profit*PF
+
+
+def get_coin_profit(coin, HR, NH, BpH):
+	BR = get_block_reward(coin)
+	P = get_coin_price(coin,'usd')
+	profit = HR*BpH*BR*P/NH
+	return profit
+
+
+def get_coin_price(coin, cur):
+	cur = cur.upper()
+	coin = coin.upper()
+	API_URL = "https://min-api.cryptocompare.com/data/price?"
+	payload = {'fsym': coin, 'tsyms': cur}
+	req = requests.get(API_URL, params=payload)
+	result = req.json()[cur] 
+	return result
+
+
+def get_block_reward(coin):
+	coin = coin.upper()
+	rewards = {'ZEC':10.0, 'XMR':5.8, 'XVG':1560.0}
+	return rewards[coin]
+
 def get_best_coin():
 	pass
 
@@ -148,6 +198,11 @@ def main():
 
 
 if __name__ == "__main__":
+	print get_coin_price('zec', 'usd')
+	print get_block_reward('zec')
+	print get_flypool_profit('zec',1300)*24
+
+
 	#main()
 
 
