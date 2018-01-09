@@ -59,31 +59,31 @@ pascal = 0
 lbry = 860000000
 
 [EQUIHASH]
-MINER_BIN = D:\Distr\Crypto\0.3.4b\miner.exe
+MINER_BIN = C:\Users\root\CryptoPro\ewbf\miner.exe
 
 [LYRA2REV2]
-MINER_BIN = D:\Distr\Crypto\ccminer\ccminer-x64.exe
+MINER_BIN = C:\Users\root\CryptoPro\ccminer\ccminer-x64.exe
 
 [CRYPTONIGHT]
-MINER_BIN = xmr-stak.exe
+MINER_BIN = C:\Users\root\CryptoPro\xmr-stak\xmr-stak.exe
 
 [SKUNK]
-MINER_BIN = D:\Distr\Crypto\ccminer\ccminer-x64.exe
+MINER_BIN = C:\Users\root\CryptoPro\ccminer\ccminer-x64.exe
 
 [NEOSCRYPT]
-MINER_BIN = D:\Distr\Crypto\ccminer\ccminer-x64.exe
+MINER_BIN = C:\Users\root\CryptoPro\ccminer\ccminer-x64.exe
 
 [SCRYPT]
-MINER_BIN = D:\Distr\Crypto\ccminer\ccminer-x64.exe
+MINER_BIN = C:\Users\root\CryptoPro\ccminer\ccminer-x64.exe
 
 [BLAKE2S]
-MINER_BIN = D:\Distr\Crypto\ccminer\ccminer-x64.exe
+MINER_BIN = C:\Users\root\CryptoPro\ccminer\ccminer-x64.exe
 
 [PASCAL]
-MINER_BIN = D:\Distr\Crypto\ccminer\ccminer-x64.exe
+MINER_BIN = C:\Users\root\CryptoPro\ccminer\ccminer-x64.exe
 
 [LBRY]
-MINER_BIN = D:\Distr\Crypto\ccminer\ccminer-x64.exe
+MINER_BIN = C:\Users\root\CryptoPro\ccminer\ccminer-x64.exe
 
 [ETHASH]
 MINER_BIN = C:\Users\root\CryptoPro\claymor\EthDcrMiner64.exe

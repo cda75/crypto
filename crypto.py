@@ -83,7 +83,7 @@ def start_nicehash_mining(algo, port):
 		pass
 	else:
 		# CCMINER
-		cmdStr = "%s -a %s -o stratum+tcp://%s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool_url, port, user, worker)
+		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool_url, port, user, worker)
 	try:
 		proc = Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
 		print "[+] Successfully started mining on %s algorithm\n" %(algo)
@@ -106,7 +106,7 @@ def endless_miner():
             kill_process(current_miner)
             sleep(3)
             current_miner = start_nicehash_mining(best_algo, port)
-        sleep(100)
+        sleep(300)
 
 
 def whattomine_best_coin():
