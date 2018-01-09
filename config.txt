@@ -2,19 +2,24 @@
 GPU_NUM = 4
 MODELS = GTX1070, GTX1070, GTX1060, GTX1060
 
-[MAIN]
-IP = 192.168.0.5
-
 [NICEHASH]
 API_URL = https://api.nicehash.com/api
 METHOD = simplemultialgo.info
-
-[BTC]
 ADDR = 1B1oMEyYkA7fPh8M5EWCnevUXWsATN33Vv
+WORKER = rig1
+scrypt = stratum+tcp://scrypt.eu.nicehash.com
+neoscrypt = stratum+tcp://neoscrypt.eu.nicehash.com
+lyra2rev2 = stratum+tcp://lyra2rev2.eu.nicehash.com
+cryptonight = stratum+tcp://cryptonight.eu.nicehash.com
+lbry = stratum+tcp://lbry.eu.nicehash.com
+equihash = stratum+tcp://equihash.eu.nicehash.com
+pascal = stratum+tcp://pascal.eu.nicehash.com
+blake2s = stratum+tcp://blake2s.eu.nicehash.com:3361
+skunk = stratum+tcp://skunk.eu.nicehash.com:3362
 
 [ZCL]
 ADDR = t1e5aSUDj1vmk5GEbE4rVB9wQSvTEMtfvyy
-ALGO = EQUIHASH
+ALGO = equihash
 POOL = europe.equihash-hub.miningpoolhub.com
 PORT = 20575
 USER = cda75.zcl
@@ -22,27 +27,27 @@ PASSWORD = x
 
 [ZEC]
 ADDR = t1Lg8CBz9G4aLLZt21xVpbXMsneFgN1Ue2j
-ALGO = EQUIHASH
+ALGO = equihash
 POOL = eu1-zcash.flypool.org:3333
 USER = rig1
 PASSWORD = x
 
 [XVG]
 ADDR = D929BwKkwuQUkvx4HeKY3jPphc3fsdhaYy
-ALGO = LYRA2REV2
+ALGO = lyra2rev2
 POOL = stratum+tcp://xvg-mine.idcray.com:10011
 USER = cda75.xvg
 PASSWORD = x
 
 [XMR]
 ADDR = 41mE7PmJzXjeyNKdomCZoVGSwbW84L5qmexZaUwoKqC4Kdqw6Ey6aTgDSZdxDiVLi5gLooAGgw6mwYfoTQE1AwktLzWF5yT
-ALGO = CRYPTONIGHT
+ALGO = cryptonight
 POOL = pool.supportxmr.com:3333
 USER = None
 PASSWORD = None
 
 [BENCHMARK]
-equihash = 1290
+equihash = 1300
 cryptonight = 1700
 skunk = 91000000
 lyra2rev2 = 115000000
@@ -54,44 +59,38 @@ pascal = 0
 lbry = 0
 
 [EQUIHASH]
-MINER_BIN = miner.exe
-MINER_PATH = C:\Users\root\CryptoPro\ewbf
+MINER_BIN = D:\Distr\Crypto\0.3.4b\miner.exe
 
 [LYRA2REV2]
-MINER_BIN = ccminer-x64.exe
-MINER_PATH = C:\Users\root\CryptoPro\ccminer
+MINER_BIN = D:\Distr\Crypto\ccminer\ccminer-x64.exe
 
 [CRYPTONIGHT]
 MINER_BIN = xmr-stak.exe
-MINER_PATH = C:\Users\root\CryptoPro\xmr-stak
 
 [SKUNK]
-MINER_BIN = ccminer-x64.exe
-MINER_PATH = C:\Users\root\CryptoPro\ccminer
+MINER_BIN = D:\Distr\Crypto\ccminer\ccminer-x64.exe
 
 [NEOSCRYPT]
-MINER_BIN = ccminer-x64.exe
-MINER_PATH = C:\Users\root\CryptoPro\ccminer
+MINER_BIN = D:\Distr\Crypto\ccminer\ccminer-x64.exe
 
 [SCRYPT]
-MINER_BIN = ccminer-x64.exe
-MINER_PATH = C:\Users\root\CryptoPro\ccminer
+MINER_BIN = D:\Distr\Crypto\ccminer\ccminer-x64.exe
 
-[BLAKE2C]
-MINER_BIN = ccminer-x64.exe
-MINER_PATH = C:\Users\root\CryptoPro\ccminer
+[BLAKE2S]
+MINER_BIN = D:\Distr\Crypto\ccminer\ccminer-x64.exe
 
 [PASCAL]
-MINER_BIN = ccminer-x64.exe
-MINER_PATH = C:\Users\root\CryptoPro\ccminer
+MINER_BIN = D:\Distr\Crypto\ccminer\ccminer-x64.exe
 
 [LBRY]
-MINER_BIN = ccminer-x64.exe
-MINER_PATH = C:\Users\root\CryptoPro\ccminer
+MINER_BIN = D:\Distr\Crypto\ccminer\ccminer-x64.exe
 
 [ETHASH]
-MINER_BIN = EthDcrMiner64.exe
-MINER_PATH = C:\Users\root\CryptoPro\claymor
+MINER_BIN = C:\Users\root\CryptoPro\claymor\EthDcrMiner64.exe
+
+
+[OVERCLOCK]
+PATH = C:\Program Files (x86)\MSI Afterburner\MSIAfterburner.exe
 
 
 
