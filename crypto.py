@@ -115,18 +115,13 @@ def whattomine_best_coin():
 	H 		= 	your equipment hashrate
 	NH 		= 	pool total hashrate
 	BpH 	= 	block per hour from pool statistic
-	D 		=	network difficulty
 	BR 		=	block reward
 	P 		=	price in USD
 
 	Reward in hour (in coins) = H*BpH*BR/NH
 	Reward in hour (in USD$) = (Reward in coins) * P
-	API_URL = https://api-zcash.flypool.org/poolStats
-	NH = data['poolstats']['hashRate']
-	BpH = data['poolstats']['blocksPerHour']
-	P = data['price']['usd']
-
 	'''
+
 	API_URL = 'http://whattomine.com/coins.json'
 	req = requests.get(API_URL)
 	reqResult = req.json()['coins']
@@ -135,17 +130,8 @@ def whattomine_best_coin():
 	for coin, value in reqResult.iteritems():
 		if value["profitability"] > profit:
 			profit = value["profitability"]
-			best_coin = coin
-		if coin == 'Zcash':
-			N = float(value["nethash"])
-			H = 1300
-			HR = H/N
-			BR = value["block_reward"]
-			E = float(86400*BR/150)
-			D = value["difficulty"]
-			R = HR*E
+                        best_coin = value['tag']
 	print best_coin, profit
-	print R
 
 
 def get_flypool_profit(coin, hashrate):
@@ -178,6 +164,7 @@ def get_coin_price(coin, cur):
 
 def get_block_reward(coin):
 	coin = coin.upper()
+        # get it from WhatToMine
 	rewards = {'ZEC':10.0, 'XMR':5.8, 'XVG':1560.0}
 	return rewards[coin]
 
@@ -198,12 +185,7 @@ def main():
 
 
 if __name__ == "__main__":
-	print get_coin_price('zec', 'usd')
-	print get_block_reward('zec')
-	print get_flypool_profit('zec',1300)*24
-
-
-	#main()
+	main()
 
 
 
