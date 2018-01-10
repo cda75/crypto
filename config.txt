@@ -14,8 +14,8 @@ cryptonight = stratum+tcp://cryptonight.eu.nicehash.com
 lbry = stratum+tcp://lbry.eu.nicehash.com
 equihash = equihash.eu.nicehash.com
 pascal = stratum+tcp://pascal.eu.nicehash.com
-blake2s = stratum+tcp://blake2s.eu.nicehash.com:3361
-skunk = stratum+tcp://skunk.eu.nicehash.com:3362
+blake2s = stratum+tcp://blake2s.eu.nicehash.com
+skunk = stratum+tcp://skunk.eu.nicehash.com
 
 [ZCL]
 ADDR = t1e5aSUDj1vmk5GEbE4rVB9wQSvTEMtfvyy
