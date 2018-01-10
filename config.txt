@@ -34,17 +34,31 @@ PASSWORD = x
 
 [XVG]
 ADDR = D929BwKkwuQUkvx4HeKY3jPphc3fsdhaYy
-ALGO = lyra2rev2
+ALGO = lyra2rev2, scrypt, blake2s, x17
+
+[XVG-LYRA2REV2]
 POOL = stratum+tcp://xvg-mine.idcray.com:10011
 USER = cda75.xvg
 PASSWORD = x
+
+[XVG-SCRYPT]
+POOL = stratum+tcp://thecoin.pw:3940
+USER = cda75.xvg
+PASSWORD = x
+
+[XVG-X17]
+POOL = stratum+tcp://yiimp.eu:3737
+USER = D929BwKkwuQUkvx4HeKY3jPphc3fsdhaYy
+
+[XVG-BLAKE2S]
+POOL = stratum+tcp://pool.unimining.net:5766
+USER = D929BwKkwuQUkvx4HeKY3jPphc3fsdhaYy
 
 [XMR]
 ADDR = 41mE7PmJzXjeyNKdomCZoVGSwbW84L5qmexZaUwoKqC4Kdqw6Ey6aTgDSZdxDiVLi5gLooAGgw6mwYfoTQE1AwktLzWF5yT
 ALGO = cryptonight
 POOL = pool.supportxmr.com:3333
 USER = None
-PASSWORD = None
 
 [BENCHMARK]
 equihash = 1300

@@ -134,22 +134,46 @@ def whattomine_best_coin():
 	print best_coin, profit
 
 
-def get_flypool_profit(coin, hashrate):
+def get_flypool_profit(hashrate):
 	FLYPOOL_API_URL = "https://api-zcash.flypool.org/poolStats"
 	req = requests.get(FLYPOOL_API_URL)
 	data = req.json()['data']
 	PF = 0.99
 	NH = data['poolStats']['hashRate']
 	BpH = data['poolStats']['blocksPerHour']
-	profit = get_coin_profit(coin, hashrate, NH, BpH)
-	return profit*PF
+	profit = get_coin_profit('ZEC', hashrate, NH, BpH)
+	return profit
+
+
+def get_xvg_profit(hashrate):
+	API_URL = "http://xvg-lyra.idcray.com/index.php?"
+	payload = {'page': 'api', 'action':'getpoolstatus', 'api_key': 'e427e3be81c79df098d074e351902bb1b210574a4fd6d641f42b74a0baafb7df'}
+	req = requests.get(API_URL, params=payload)
+	sleep(7)
+	data = req.json()[payload['action']]['data']
+	NH = data["hashrate"]
+	BpH = 3600/data['esttime']
+	profit = get_coin_profit('XVG', hashrate, NH, BpH)
+	return profit
+
+
+def get_zcl_profit(hashrate):
+	API_URL = "https://zclassic.miningpoolhub.com/"
+	payload = {'page': 'api', 'action':'getpoolstatus', 'api_key': 'cfdbe7a47bcdcb088d0e11aee243679963c1806f74861136c2b7043a6a89e4a5'}
+	req = requests.get(API_URL, params=payload)
+	data = req.json()[payload['action']]['data']
+	NH = data["hashrate"]
+	BpH = 3600/data['esttime']
+	profit = get_coin_profit('ZCL', hashrate, NH, BpH)
+	return profit
 
 
 def get_coin_profit(coin, HR, NH, BpH):
 	BR = get_block_reward(coin)
 	P = get_coin_price(coin,'usd')
-	profit = HR*BpH*BR*P/NH
-	return profit
+	usd_profit = HR*BpH*BR*P/NH
+	coin_profit = HR*BpH*BR/NH
+	return 24*usd_profit, 24*coin_profit
 
 
 def get_coin_price(coin, cur):
@@ -164,8 +188,9 @@ def get_coin_price(coin, cur):
 
 def get_block_reward(coin):
 	coin = coin.upper()
+	API_URL = ''
         # get it from WhatToMine
-	rewards = {'ZEC':10.0, 'XMR':5.8, 'XVG':1560.0}
+	rewards = {'ZEC':10.0, 'XMR':5.8, 'XVG':1560.0, 'ZCL':12.5}
 	return rewards[coin]
 
 def get_best_coin():
@@ -185,7 +210,7 @@ def main():
 
 
 if __name__ == "__main__":
-	main()
+#	main()
 
 
 
