@@ -114,7 +114,7 @@ def whattomine_best_coin():
 	Calculate the best profit for coin from mining pool
 	H 		= 	your equipment hashrate
 	NH 		= 	pool total hashrate
-	BpH 	= 	block per hour from pool statistic
+	BpH 	= 	blocks per hour from pool statistic or Estimated Average Pool Round Time
 	BR 		=	block reward
 	P 		=	price in USD
 
@@ -130,11 +130,11 @@ def whattomine_best_coin():
 	for coin, value in reqResult.iteritems():
 		if value["profitability"] > profit:
 			profit = value["profitability"]
-                        best_coin = value['tag']
+			best_coin = value['tag']
 	print best_coin, profit
 
 
-def get_flypool_profit(hashrate):
+def get_ZEC_profit(hashrate):
 	FLYPOOL_API_URL = "https://api-zcash.flypool.org/poolStats"
 	req = requests.get(FLYPOOL_API_URL)
 	data = req.json()['data']
@@ -145,11 +145,10 @@ def get_flypool_profit(hashrate):
 	return profit
 
 
-def get_xvg_profit(hashrate):
+def get_XVG_profit(hashrate):
 	API_URL = "http://xvg-lyra.idcray.com/index.php?"
 	payload = {'page': 'api', 'action':'getpoolstatus', 'api_key': 'e427e3be81c79df098d074e351902bb1b210574a4fd6d641f42b74a0baafb7df'}
 	req = requests.get(API_URL, params=payload)
-	sleep(7)
 	data = req.json()[payload['action']]['data']
 	NH = data["hashrate"]
 	BpH = 3600/data['esttime']
@@ -157,7 +156,7 @@ def get_xvg_profit(hashrate):
 	return profit
 
 
-def get_zcl_profit(hashrate):
+def get_ZCL_profit(hashrate):
 	API_URL = "https://zclassic.miningpoolhub.com/"
 	payload = {'page': 'api', 'action':'getpoolstatus', 'api_key': 'cfdbe7a47bcdcb088d0e11aee243679963c1806f74861136c2b7043a6a89e4a5'}
 	req = requests.get(API_URL, params=payload)
@@ -210,17 +209,4 @@ def main():
 
 
 if __name__ == "__main__":
-#	main()
-
-
-
-
-
-
-
-
-
-
-
-
-
+	main()
