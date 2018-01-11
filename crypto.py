@@ -86,7 +86,7 @@ def start_nicehash_mining(algo):
 		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool_url, port, user, worker)
 	try:
 		proc = Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
-		print "[+] Successfully started mining on %s algorithm\n" %(algo)
+		print "[+] Successfully started mining on %s algorithm\n" %(algo['name'])
 		sleep(3)
 		return os.path.basename(miner_bin)
 	except:
@@ -108,17 +108,17 @@ def get_nicehash_stat(algo_id):
 
 
 def endless_miner():
-    best_algo, port = nicehash_best_algo()
-    current_miner = start_nicehash_mining(best_algo, port)
-    CURRENT_ALGO = best_algo
+    best_algo = nicehash_best_algo()
+    CURRENT_ALGO = best_algo['name']
+    current_miner = start_nicehash_mining(best_algo)
     sleep(60)
     while True:    
-        best_algo, port = nicehash_best_algo()
-        if CURRENT_ALGO != best_algo:
-            CURRENT_ALGO = best_algo
+        best_algo = nicehash_best_algo()
+        if CURRENT_ALGO != best_algo['name']:
+            CURRENT_ALGO = best_algo['name']
             kill_process(current_miner)
             sleep(3)
-            current_miner = start_nicehash_mining(best_algo, port)
+            current_miner = start_nicehash_mining(best_algo)
         sleep(300)
 
 
@@ -232,8 +232,4 @@ def main():
 
 
 if __name__ == "__main__":
-	while True:
-		print get_nicehash_stat(29)
-		sleep(60)
-
-#	main()
+	main()
