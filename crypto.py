@@ -32,11 +32,10 @@ def nicehash_best_algo():
 			algo_value = algo_price*algo_speed
 			if algo_value > best_value:
 				best_value = algo_value
-				best_algo = algo_name
-				algo_port = i['port']
+				best_algo = i
 	current_time = datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
 	print "\n[%s] Current NiceHash Best Algo: %s" %(current_time, best_algo)
-	return best_algo, algo_port
+	return best_algo
 
 
 def kill_process(processName):
@@ -64,20 +63,21 @@ def start_overclock(profile=1):
 	sleep(5)
 
 
-def start_nicehash_mining(algo, port):
+def start_nicehash_mining(algo):
 	cfg = SafeConfigParser()
 	cfg.read(CONFIG_FILE)
-	miner_bin = cfg.get(algo.upper(),'MINER_BIN')
-	pool_url = cfg.get('NICEHASH', algo)
+	miner_bin = cfg.get(algo['name'].upper(),'MINER_BIN')
+	pool_url = cfg.get('NICEHASH', algo['name'])
 	user = cfg.get('NICEHASH', 'ADDR')
 	worker = cfg.get('NICEHASH', 'WORKER')
-	if algo == 'equihash':
+	port = algo['port']
+	if algo['name'] == 'equihash':
 		# EWBF Zcash CUDA miner
 		cmdStr = "%s --server %s --port %s --user %s.%s --fee 0" %(miner_bin, pool_url, port, user, worker)
-	elif algo == 'cryptonight':
+	elif algo['name'] == 'cryptonight':
 		# XMR-STAK
 		pass
-	elif algo == 'ethash':
+	elif algo['name'] == 'ethash':
 		# CLAYMOR DUAL miner
 		print 'Not ready yet'
 		pass
@@ -92,6 +92,19 @@ def start_nicehash_mining(algo, port):
 	except:
 		print "[-] ERROR starting miner"
 		return False
+
+
+def get_nicehash_stat(algo_id):
+	cfg = SafeConfigParser()
+	cfg.read(CONFIG_FILE)
+	API_URL = cfg.get('NICEHASH', 'API_URL')
+	method = 'stats.provider.workers'
+	ADDR = cfg.get('NICEHASH', 'ADDR')
+	payload = {'method':method, 'addr':ADDR, 'algo':algo_id}
+	req = requests.get(API_URL, params=payload)
+	reqResult = req.json()['result']
+	workers = reqResult['workers']
+	return workers[1]['a']
 
 
 def endless_miner():
@@ -125,13 +138,13 @@ def whattomine_best_coin():
 	API_URL = 'http://whattomine.com/coins.json'
 	req = requests.get(API_URL)
 	reqResult = req.json()['coins']
-	coins = reqResult.keys()
 	profit = 0
 	for coin, value in reqResult.iteritems():
 		if value["profitability"] > profit:
 			profit = value["profitability"]
 			best_coin = value['tag']
 	print best_coin, profit
+
 
 
 def get_ZEC_profit(hashrate):
@@ -168,7 +181,7 @@ def get_ZCL_profit(hashrate):
 
 
 def get_coin_profit(coin, HR, NH, BpH):
-	BR = get_block_reward(coin)
+	BR = get_coin_data(coin)[0]
 	P = get_coin_price(coin,'usd')
 	usd_profit = HR*BpH*BR*P/NH
 	coin_profit = HR*BpH*BR/NH
@@ -185,12 +198,22 @@ def get_coin_price(coin, cur):
 	return result
 
 
-def get_block_reward(coin):
+def get_coin_data(coin):
 	coin = coin.upper()
-	API_URL = ''
-        # get it from WhatToMine
-	rewards = {'ZEC':10.0, 'XMR':5.8, 'XVG':1560.0, 'ZCL':12.5}
-	return rewards[coin]
+	URL = "http://whattomine.com/coins.json"
+	req = requests.get(URL)
+	data = req.json()['coins'].values() 
+	for v in data:
+		if v["tag"] == coin:
+			block_reward = v["block_reward"]
+			block_time = float(v["block_time"])
+			algo = v["algorithm"]
+			profit = v["profitability"]
+			nethash = v["nethash"]
+			diff = v["difficulty"]
+	return block_reward, block_time, profit
+
+
 
 def get_best_coin():
 	pass
@@ -209,4 +232,8 @@ def main():
 
 
 if __name__ == "__main__":
-	main()
+	while True:
+		print get_nicehash_stat(29)
+		sleep(60)
+
+#	main()
