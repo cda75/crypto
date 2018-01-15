@@ -63,7 +63,7 @@ USER = None
 [BENCHMARK]
 equihash = 1610
 cryptonight = 2100
-skunk = 103000000
+skunk = 110000000
 lyra2rev2 = 130000000
 blake2c = 11400000000
 neoscrypt = 3220000
