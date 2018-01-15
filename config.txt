@@ -5,7 +5,7 @@ MODELS = GTX1070, GTX1070, GTX1060, GTX1060
 [NICEHASH]
 API_URL = https://api.nicehash.com/api
 METHOD = simplemultialgo.info
-ADDR = 1B1oMEyYkA7fPh8M5EWCnevUXWsATN33Vv
+ADDR = 1P2EP9MbWMFtRw5Ns7kv5LHcofn2nmHFdV
 WORKER = rig1
 scrypt = stratum+tcp://scrypt.eu.nicehash.com
 neoscrypt = stratum+tcp://neoscrypt.eu.nicehash.com
@@ -62,9 +62,9 @@ USER = None
 
 [BENCHMARK]
 equihash = 1610
-cryptonight = 1900
+cryptonight = 2100
 skunk = 103000000
-lyra2rev2 = 115000000
+lyra2rev2 = 130000000
 blake2c = 11400000000
 neoscrypt = 3220000
 scrypt = 0

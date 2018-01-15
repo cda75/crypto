@@ -1,10 +1,11 @@
 import requests
+from time import sleep
 
 
 
 API_URL = "https://min-api.cryptocompare.com/data/price?"
-CRYPTO = ["BTC", "XMR", "ZEC", "ETH", "XRP", "XVG"]
-CUR = "USD"
+CRYPTO = ["BTC", "XMR", "ZEC", "ZCL", "ETH", "XRP", "XVG"]
+CUR = "RUB"
 
 
 def get_all_crypto():
@@ -24,5 +25,8 @@ def get_price(crypto, cur):
 
 
 if __name__ == "__main__":
-	get_all_crypto()
+	while True:
+		get_all_crypto()
+		print "\n---------------------------------------\n"
+		sleep(60)
 
