@@ -4,7 +4,7 @@ import requests
 import os
 from datetime import datetime
 from time import sleep
-from subprocess import Popen, CREATE_NEW_CONSOLE
+#from subprocess import Popen, CREATE_NEW_CONSOLE
 import psutil
 from ConfigParser import SafeConfigParser 
 import operator
@@ -13,7 +13,7 @@ import operator
 
 WORK_DIR = os.path.dirname(os.path.realpath(__file__))
 CONFIG_FILE = os.path.join(WORK_DIR, 'config.txt')
-
+MY_COINS = ['ZEC','ZCL','XMR', 'XVG-LYRA2V2', 'HUSH']
 
 def nicehash_best_algo():
 	cfg = SafeConfigParser()
@@ -125,8 +125,7 @@ def endless_miner():
 
 
 def whattomine_best_coin():
-	JSON_URL = "http://whattomine.com/coins.json?utf8=✓&adapt_q_280x=0&adapt_q_380=0&adapt_q_fury=0&adapt_q_470=0&adapt_q_480=3&adapt_q_570=0&adapt_q_580=0&adapt_q_vega56=0&adapt_q_vega64=0&adapt_q_750Ti=0&adapt_q_1050Ti=0&adapt_q_10606=1&adapt_10606=true&adapt_q_1070=2&adapt_1070=true&adapt_q_1070Ti=1&adapt_1070Ti=true&adapt_q_1080=0&adapt_q_1080Ti=0&eth=true&factor%5Beth_hr%5D=113.0&factor%5Beth_p%5D=465.0&grof=true&factor%5Bgro_hr%5D=124.0&factor%5Bgro_p%5D=470.0&x11gf=true&factor%5Bx11g_hr%5D=43.4&factor%5Bx11g_p%5D=450.0&cn=true&factor%5Bcn_hr%5D=2320.0&factor%5Bcn_p%5D=360.0&eq=true&factor%5Beq_hr%5D=1600.0&factor%5Beq_p%5D=450.0&lre=true&factor%5Blrev2_hr%5D=132300.0&factor%5Blrev2_p%5D=470.0&ns=true&factor%5Bns_hr%5D=3550.0&factor%5Bns_p%5D=470.0&lbry=true&factor%5Blbry_hr%5D=1020.0&factor%5Blbry_p%5D=450.0&bk2bf=true&factor%5Bbk2b_hr%5D=5990.0&factor%5Bbk2b_p%5D=440.0&bk14=true&factor%5Bbk14_hr%5D=9100.0&factor%5Bbk14_p%5D=460.0&pas=true&factor%5Bpas_hr%5D=3580.0&factor%5Bpas_p%5D=450.0&skh=true&factor%5Bskh_hr%5D=104.5&factor%5Bskh_p%5D=450.0&factor%5Bl2z_hr%5D=420.0&factor%5Bl2z_p%5D=300.0&factor%5Bcost%5D=0.1&sort=Profit&volume=50&revenue=current&factor%5Bexchanges%5D%5B%5D=&factor%5Bexchanges%5D%5B%5D=abucoins&factor%5Bexchanges%5D%5B%5D=bitfinex&factor%5Bexchanges%5D%5B%5D=bittrex&factor%5Bexchanges%5D%5B%5D=bleutrade&factor%5Bexchanges%5D%5B%5D=cryptopia&factor%5Bexchanges%5D%5B%5D=hitbtc&factor%5Bexchanges%5D%5B%5D=poloniex&factor%5Bexchanges%5D%5B%5D=yobit&dataset=Main&commit=Calculate"
-	
+        JSON_URL = "https://whattomine.com/coins.json?utf8=✓&adapt_q_280x=0&adapt_q_380=0&adapt_q_fury=0&adapt_q_470=0&adapt_q_480=0&adapt_q_570=0&adapt_q_580=3&adapt_q_vega56=0&adapt_q_vega64=0&adapt_q_750Ti=0&adapt_q_1050Ti=0&adapt_q_10606=1&adapt_10606=true&adapt_q_1070=2&adapt_1070=true&adapt_q_1070Ti=1&adapt_1070Ti=true&adapt_q_1080=03&adapt_q_1080Ti=0&eth=true&factor%5Beth_hr%5D=113.0&factor%5Beth_p%5D=465.0&grof=true&factor%5Bgro_hr%5D=124.0&factor%5Bgro_p%5D=470.0&x11gf=true&factor%5Bx11g_hr%5D=43.4&factor%5Bx11g_p%5D=450.0&cn=true&factor%5Bcn_hr%5D=2320.0&factor%5Bcn_p%5D=360.0&eq=true&factor%5Beq_hr%5D=1600.0&factor%5Beq_p%5D=450.0&lre=true&factor%5Blrev2_hr%5D=132300.0&factor%5Blrev2_p%5D=470.0&ns=true&factor%5Bns_hr%5D=3550.0&factor%5Bns_p%5D=470.0&lbry=true&factor%5Blbry_hr%5D=1020.0&factor%5Blbry_p%5D=450.0&factor%5Bbk2b_hr%5D=5990.0&factor%5Bbk2b_p%5D=440.0&factor%5Bbk14_hr%5D=9100.0&factor%5Bbk14_p%5D=460.0&pas=true&factor%5Bpas_hr%5D=3580.0&factor%5Bpas_p%5D=450.0&skh=true&factor%5Bskh_hr%5D=104.5&factor%5Bskh_p%5D=450.0&factor%5Bl2z_hr%5D=420.0&factor%5Bl2z_p%5D=300.0&factor%5Bcost%5D=0.1&sort=Profit&volume=0&revenue=current&factor%5Bexchanges%5D%5B%5D=&factor%5Bexchanges%5D%5B%5D=abucoins&factor%5Bexchanges%5D%5B%5D=bitfinex&factor%5Bexchanges%5D%5B%5D=bittrex&factor%5Bexchanges%5D%5B%5D=bleutrade&factor%5Bexchanges%5D%5B%5D=cryptopia&factor%5Bexchanges%5D%5B%5D=hitbtc&factor%5Bexchanges%5D%5B%5D=poloniex&factor%5Bexchanges%5D%5B%5D=yobit&dataset=Main&commit=Calculate"	
 	'''
 	Calculate the best profit for coin from mining pool
 	H 		= 	your equipment hashrate
@@ -148,9 +147,13 @@ def whattomine_best_coin():
 		if value["profitability"] > profit:
 			profit = value["profitability"]
 			best_coin = value['tag']
-	print best_coin, profit
-	return sorted(best_dict.items(), key=operator.itemgetter(1))
-
+                        algo = value['algorithm']
+        print best_coin, algo 
+	rez = sorted(best_dict.items(), key=operator.itemgetter(1), reverse=True)
+        for i in rez:
+            best_coin = i[0]
+            if best_coin in MY_COINS:
+                return best_coin
 
 
 def get_ZEC_profit(hashrate):
@@ -228,6 +231,8 @@ def get_best_coin():
 def start_mining_coin(coin):
 	cfg = SafeConfigParser()
 	cfg.read(CONFIG_FILE)
+        print 'Started mining coin %s' %coin
+        pass
 
 
 def main():
@@ -238,5 +243,10 @@ def main():
 
 
 if __name__ == "__main__":
-	main()
+#	main()
+        best_coin = whattomine_best_coin()
+        start_mining_coin(best_coin)
+        
+
+
 
