@@ -1,6 +1,6 @@
 [GPU]
 GPU_NUM = 4
-MODELS = GTX1070, GTX1070, GTX1060, GTX1060
+MODELS = GTX1070Ti, GTX1070Ti, GTX1060, GTX1060
 
 [NICEHASH]
 API_URL = https://api.nicehash.com/api
@@ -22,43 +22,61 @@ ADDR = t1e5aSUDj1vmk5GEbE4rVB9wQSvTEMtfvyy
 ALGO = equihash
 POOL = europe.equihash-hub.miningpoolhub.com
 PORT = 20575
-USER = cda75.zcl
+USER = cda75
+WORKER = zcl
 PASSWORD = x
 
 [ZEC]
 ADDR = t1Lg8CBz9G4aLLZt21xVpbXMsneFgN1Ue2j
 ALGO = equihash
-POOL = eu1-zcash.flypool.org:3333
-USER = rig1
+POOL = eu1-zcash.flypool.org
+PORT = 3333
+USER = ${ADDR}
+WORKER = rig1
 PASSWORD = x
+
+[HUSH]
+ADDR = 
+ALGO = equihash
+POOL = 
+PORT = 
+USER = ${ADDR}
+WORKER = rig1
+PASSWORD = x
+
 
 [XVG]
 ADDR = D929BwKkwuQUkvx4HeKY3jPphc3fsdhaYy
-ALGO = lyra2rev2, scrypt, blake2s, x17
+ALGO = lyra2rev2, scrypt, blake2s
 
 [XVG-LYRA2REV2]
-POOL = stratum+tcp://xvg-mine.idcray.com:10011
+ALGO = lyra2rev2
+POOL = stratum+tcp://xvg-mine.idcray.com
+PORT = 10011
 USER = cda75.xvg
 PASSWORD = x
 
 [XVG-SCRYPT]
-POOL = stratum+tcp://thecoin.pw:3940
+POOL = stratum+tcp://thecoin.pw
+PORT = 3940
+ALGO = scrypt
 USER = cda75.xvg
 PASSWORD = x
 
-[XVG-X17]
-POOL = stratum+tcp://yiimp.eu:3737
-USER = D929BwKkwuQUkvx4HeKY3jPphc3fsdhaYy
-
 [XVG-BLAKE2S]
-POOL = stratum+tcp://pool.unimining.net:5766
+ALGO = blake2s
+POOL = stratum+tcp://pool.unimining.net
+PORT = 5766
 USER = D929BwKkwuQUkvx4HeKY3jPphc3fsdhaYy
+PASSWORD = None
 
 [XMR]
 ADDR = 41mE7PmJzXjeyNKdomCZoVGSwbW84L5qmexZaUwoKqC4Kdqw6Ey6aTgDSZdxDiVLi5gLooAGgw6mwYfoTQE1AwktLzWF5yT
 ALGO = cryptonight
-POOL = pool.supportxmr.com:3333
+POOL = pool.supportxmr.com
+PORT = 3333
 USER = None
+PASSWORD = None
 
 [BENCHMARK]
 equihash = 1610

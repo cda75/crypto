@@ -4,7 +4,7 @@ import requests
 import os
 from datetime import datetime
 from time import sleep
-#from subprocess import Popen, CREATE_NEW_CONSOLE
+from subprocess import Popen, CREATE_NEW_CONSOLE
 import psutil
 from ConfigParser import SafeConfigParser 
 import operator
@@ -155,7 +155,7 @@ def whattomine_best_coin():
             if best_coin in MY_COINS:
                 return best_coin
 
-
+'''
 def get_ZEC_profit(hashrate):
 	FLYPOOL_API_URL = "https://api-zcash.flypool.org/poolStats"
 	req = requests.get(FLYPOOL_API_URL)
@@ -222,17 +222,44 @@ def get_coin_data(coin):
 			diff = v["difficulty"]
 	return block_reward, block_time, profit
 
-
-
-def get_best_coin():
-	pass
+'''
 
 
 def start_mining_coin(coin):
 	cfg = SafeConfigParser()
 	cfg.read(CONFIG_FILE)
-        print 'Started mining coin %s' %coin
-        pass
+	algo = cfg.get(coin.upper(), 'ALGO')
+	miner_bin = cfg.get(algo.upper(),'MINER_BIN')
+	print miner_bin
+	user = cfg.get(coin.upper(), 'USER')
+	addr = cfg.get(coin.upper(), 'ADDR')
+	pool = cfg.get(coin.upper(), 'POOL')
+	port = cfg.get(coin.upper(), 'PORT')
+	worker = cfg.get(coin.upper(), 'WORKER')
+	if algo == 'equihash':
+		# EWBF Zcash CUDA miner
+		cmdStr = "%s --server %s --port %s --user %s.%s --fee 0" %(miner_bin, pool, port, user, worker)
+	elif algo == 'cryptonight':
+		# XMR-STAK
+		pass
+	elif algo == 'ethash':
+		# CLAYMOR DUAL miner
+		print 'Not ready yet'
+		pass
+	else:
+		# CCMINER
+		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, port, user, worker)
+	try:
+		proc = Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
+		print "[+] Successfully started mining on %s algorithm\n" %(algo)
+		sleep(3)
+		return os.path.basename(miner_bin)
+	except:
+		print "[-] ERROR starting miner"
+		return False
+
+	print 'Started mining coin %s' %coin
+
 
 
 def main():
@@ -245,6 +272,7 @@ def main():
 if __name__ == "__main__":
 #	main()
         best_coin = whattomine_best_coin()
+        print best_coin
         start_mining_coin(best_coin)
         
 
