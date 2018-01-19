@@ -80,6 +80,7 @@ def start_mining_coin(coin):
 	pool = cfg.get(coin, 'POOL')
 	port = cfg.get(coin, 'PORT')
 	worker = cfg.get(coin, 'WORKER')
+	password = cfg.get(coin, 'PASSWORD')
 	cfg.read(CONFIG)
 	miner_bin = cfg.get('ALGO', algo)
 	if algo == 'equihash':
@@ -91,6 +92,7 @@ def start_mining_coin(coin):
 	elif algo == 'ethash':
 		# CLAYMOR DUAL miner
 		print 'Not ready yet'
+		cmdStr = "%s -epool %s:%s -ewal %s.%s -epsw %s" %(miner_bin, pool, user, worker, password)
 		pass
 	else:
 		# CCMINER
