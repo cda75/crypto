@@ -1,125 +1,14 @@
-[GPU]
-GPU_NUM = 4
-MODELS = GTX1070Ti, GTX1070Ti, GTX1060, GTX1060
-
-[NICEHASH]
-API_URL = https://api.nicehash.com/api
-METHOD = simplemultialgo.info
-ADDR = 1P2EP9MbWMFtRw5Ns7kv5LHcofn2nmHFdV
-WORKER = rig1
-scrypt = stratum+tcp://scrypt.eu.nicehash.com
-neoscrypt = stratum+tcp://neoscrypt.eu.nicehash.com
-lyra2rev2 = stratum+tcp://lyra2rev2.eu.nicehash.com
-cryptonight = stratum+tcp://cryptonight.eu.nicehash.com
-lbry = stratum+tcp://lbry.eu.nicehash.com
-equihash = equihash.eu.nicehash.com
-pascal = stratum+tcp://pascal.eu.nicehash.com
-blake2s = stratum+tcp://blake2s.eu.nicehash.com
-skunk = stratum+tcp://skunk.eu.nicehash.com
-
-[ZCL]
-ADDR = t1e5aSUDj1vmk5GEbE4rVB9wQSvTEMtfvyy
-ALGO = equihash
-POOL = europe.equihash-hub.miningpoolhub.com
-PORT = 20575
-USER = cda75
-WORKER = zcl
-PASSWORD = x
-
-[ZEC]
-ADDR = t1Lg8CBz9G4aLLZt21xVpbXMsneFgN1Ue2j
-ALGO = equihash
-POOL = eu1-zcash.flypool.org
-PORT = 3333
-USER = ${ADDR}
-WORKER = rig1
-PASSWORD = x
-
-[HUSH]
-ADDR = 
-ALGO = equihash
-POOL = 
-PORT = 
-USER = ${ADDR}
-WORKER = rig1
-PASSWORD = x
-
-
-[XVG]
-ADDR = D929BwKkwuQUkvx4HeKY3jPphc3fsdhaYy
-ALGO = lyra2rev2, scrypt, blake2s
-
-[XVG-LYRA2REV2]
-ALGO = lyra2rev2
-POOL = stratum+tcp://xvg-mine.idcray.com
-PORT = 10011
-USER = cda75.xvg
-PASSWORD = x
-
-[XVG-SCRYPT]
-POOL = stratum+tcp://thecoin.pw
-PORT = 3940
-ALGO = scrypt
-USER = cda75.xvg
-PASSWORD = x
-
-[XVG-BLAKE2S]
-ALGO = blake2s
-POOL = stratum+tcp://pool.unimining.net
-PORT = 5766
-USER = D929BwKkwuQUkvx4HeKY3jPphc3fsdhaYy
-PASSWORD = None
-
-[XMR]
-ADDR = 41mE7PmJzXjeyNKdomCZoVGSwbW84L5qmexZaUwoKqC4Kdqw6Ey6aTgDSZdxDiVLi5gLooAGgw6mwYfoTQE1AwktLzWF5yT
-ALGO = cryptonight
-POOL = pool.supportxmr.com
-PORT = 3333
-USER = None
-PASSWORD = None
-
-[BENCHMARK]
-equihash = 1610
-cryptonight = 2100
-skunk = 110000000
-lyra2rev2 = 130000000
-blake2c = 11400000000
-neoscrypt = 3220000
-scrypt = 0
-ethash = 0
-pascal = 0
-lbry = 860000000
-
-[EQUIHASH]
-MINER_BIN = C:\Users\root\CryptoPro\ewbf\miner.exe
-
-[LYRA2REV2]
-MINER_BIN = C:\Users\root\CryptoPro\ccminer\ccminer-x64.exe
-
-[CRYPTONIGHT]
-MINER_BIN = C:\Users\root\CryptoPro\xmr-stak\xmr-stak.exe
-
-[SKUNK]
-MINER_BIN = C:\Users\root\CryptoPro\ccminer\ccminer-x64.exe
-
-[NEOSCRYPT]
-MINER_BIN = C:\Users\root\CryptoPro\ccminer\ccminer-x64.exe
-
-[SCRYPT]
-MINER_BIN = C:\Users\root\CryptoPro\ccminer\ccminer-x64.exe
-
-[BLAKE2S]
-MINER_BIN = C:\Users\root\CryptoPro\ccminer\ccminer-x64.exe
-
-[PASCAL]
-MINER_BIN = C:\Users\root\CryptoPro\ccminer\ccminer-x64.exe
-
-[LBRY]
-MINER_BIN = C:\Users\root\CryptoPro\ccminer\ccminer-x64.exe
-
-[ETHASH]
-MINER_BIN = C:\Users\root\CryptoPro\claymor\EthDcrMiner64.exe
-
+[ALGO]
+equihash = C:\Users\root\CryptoPro\ewbf\miner.exe
+ethash = C:\Users\root\CryptoPro\claymor\EthDcrMiner64.exe
+cryptonight = C:\Users\root\CryptoPro\xmr-stak\xmr-stak.exe
+lyra2rev2 = C:\Users\root\CryptoPro\ccminer\ccminer-x64.exe
+skunk = %(lyra2rev2)s
+neoscrypt = %(lyra2rev2)s
+scrypt = %(lyra2rev2)s
+blake2s = %(lyra2rev2)s
+pascal = %(lyra2rev2)s
+lbry = %(lyra2rev2)s
 
 [OVERCLOCK]
 PATH = C:\Program Files (x86)\MSI Afterburner\MSIAfterburner.exe
