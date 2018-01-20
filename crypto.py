@@ -112,7 +112,18 @@ def start_mining_coin(coin):
 
 if __name__ == "__main__":
 	best_coin = get_best_coin()
-	start_mining_coin(best_coin)
+	process = start_mining_coin(best_coin)
+	sleep(600)
+	while True:
+		new_coin = get_best_coin()
+		if new_coin != best_coin:
+			best_coin = new_coin
+			kill_process(process)
+			process = start_mining_coin(best_coin)
+			sleep(1000)
+
+
+
 
 
         
