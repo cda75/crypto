@@ -46,13 +46,13 @@ def get_best_coin():
 		if value["profitability"] > profit:
 			profit = value["profitability"]
 			best_coin = value['tag']
-                        algo = value['algorithm']
-        print "Current best coin %s with %s" %(best_coin, algo) 
+			algo = value['algorithm']
+	print "Current best coin %s with %s" %(best_coin, algo) 
 	rez = sorted(best_dict.items(), key=operator.itemgetter(1), reverse=True)
-        for i in rez:
-            best_coin = i[0]
-            if best_coin in MY_COINS:
-                return best_coin
+	for i in rez:
+		best_coin = i[0]
+		if best_coin in MY_COINS:
+			return best_coin
 
 
 def start_mining_coin(coin):
@@ -69,15 +69,13 @@ def start_mining_coin(coin):
 	miner_bin = cfg.get('ALGO', algo)
 	if algo == 'equihash':
 		# EWBF Zcash CUDA miner
-		cmdStr = "%s --server %s --port %s --user %s.%s --fee 0" %(miner_bin, pool, port, user, worker)
+		cmdStr = "%s --server %s --port %s --user %s.%s --api 0.0.0.0:42000 --fee 0" %(miner_bin, pool, port, user, worker)
 	elif algo == 'cryptonight':
 		# XMR-STAK
 		pass
 	elif algo == 'ethash':
 		# CLAYMOR DUAL miner
-		print 'Not ready yet'
-		cmdStr = "%s -epool %s:%s -ewal %s.%s -epsw %s" %(miner_bin, pool, user, worker, password)
-		pass
+		cmdStr = "%s -epool %s:%s -ewal %s.%s -epsw %s" %(miner_bin, pool, port, user, worker, password)
 	else:
 		# CCMINER
 		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, port, user, worker)
