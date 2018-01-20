@@ -17,8 +17,8 @@ COINS = os.path.join(WORK_DIR, 'coins.conf')
 
 
 def kill_process(processName):
-    cmdStr = "taskkill /f /im %s" %(processName)
-    os.system(cmdStr)
+	cmdStr = "taskkill /f /im %s" %(processName)
+	os.system(cmdStr)
 
 
 def get_best_coin():
@@ -96,21 +96,11 @@ def start_mining_coin(coin):
 if __name__ == "__main__":
 	best_coin = get_best_coin()
 	process = start_mining_coin(best_coin)
-	sleep(600)
 	while True:
+		sleep(900)
 		new_coin = get_best_coin()
 		if new_coin != best_coin:
 			best_coin = new_coin
 			kill_process(process)
 			sleep(5)
 			process = start_mining_coin(best_coin)
-		sleep(1000)
-
-
-
-
-
-        
-
-
-

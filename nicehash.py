@@ -21,7 +21,6 @@ def nicehash_best_algo():
 	cfg.read(BENCHMARK)
 	algo_dict = dict(cfg.items('DEFAULT'))
 	my_algo = algo_dict.keys()
-	print my_algo
 	best_value = 0
 	cfg.read(NICEHASH)
 	API_URL = cfg.get('DEFAULT', 'API_URL')
@@ -38,14 +37,12 @@ def nicehash_best_algo():
 			if algo_value > best_value:
 				best_value = algo_value
 				best_algo = i
-	current_time = datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
-	print "\n[%s] Current NiceHash Best Algo: %s" %(current_time, best_algo['name'])
 	return best_algo
 
 
 def kill_process(processName):
-    cmdStr = "taskkill /f /im %s" %(processName)
-    os.system(cmdStr)
+	cmdStr = "taskkill /f /im %s" %(processName)
+	os.system(cmdStr)
 
 
 def start_nicehash_mining(algo):
@@ -53,26 +50,26 @@ def start_nicehash_mining(algo):
 	cfg.read(CONFIG)
 	miner_bin = cfg.get('ALGO', algo['name'])
 	cfg.read(NICEHASH)
-	pool_url = cfg.get('DEFAULT', algo['name'])
+	pool = cfg.get('DEFAULT', algo['name'])
 	user = cfg.get('DEFAULT', 'ADDR')
 	worker = cfg.get('DEFAULT', 'WORKER')
 	port = algo['port']
 	if algo['name'] == 'equihash':
 		# EWBF Zcash CUDA miner
-		cmdStr = "%s --server %s --port %s --user %s.%s --fee 0" %(miner_bin, pool_url, port, user, worker)
+		cmdStr = "%s --server %s --port %s --user %s.%s --api 127.0.0.1:42000 --fee 0" %(miner_bin, pool, port, user, worker)
 	elif algo['name'] == 'cryptonight':
 		# XMR-STAK
 		pass
 	elif algo['name'] == 'ethash':
 		# CLAYMOR DUAL miner
-		print 'Not ready yet'
-		pass
+		cmdStr = "%s -epool %s:%s -ewal %s.%s -epsw %s" %(miner_bin, pool, port, user, worker, password)
 	else:
 		# CCMINER
-		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo['name'], pool_url, port, user, worker)
+		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo['name'], pool, port, user, worker)
 	try:
-		print cmdStr
 		proc = Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
+		current_time = datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
+		print "\n[%s] Current NiceHash Best Algo: %s" %(current_time, best_algo['name'])
 		print "[+] Successfully started mining on %s algorithm\n" %(algo['name'])
 		sleep(3)
 		return os.path.basename(miner_bin)
@@ -82,32 +79,37 @@ def start_nicehash_mining(algo):
 
 
 def get_nicehash_stat(algo_id):
+	if algo_id in [8,14,29]:
+		unit = 'MH/s'
+	elif algo_id in [23,28]:
+		unit = 'GH/s'
+	else:
+		unit = 'H/s'
 	cfg = SafeConfigParser()
-	cfg.read(CONFIG_FILE)
-	API_URL = cfg.get('NICEHASH', 'API_URL')
+	cfg.read(NICEHASH)
+	API_URL = cfg.get('DEFAULT', 'API_URL')
 	method = 'stats.provider.workers'
-	ADDR = cfg.get('NICEHASH', 'ADDR')
+	ADDR = cfg.get('DEFAULT', 'ADDR')
 	payload = {'method':method, 'addr':ADDR, 'algo':algo_id}
 	req = requests.get(API_URL, params=payload)
 	reqResult = req.json()['result']
 	workers = reqResult['workers']
-	return workers[1]['a']
+	hash_speed = str(workers[0][1]['a'])
+	print "%s %s" %(hash_speed, unit)
 
-
-def endless_miner():
-    best_algo = nicehash_best_algo()
-    CURRENT_ALGO = best_algo['name']
-    current_miner = start_nicehash_mining(best_algo)
-    sleep(60)
-    while True:    
-        best_algo = nicehash_best_algo()
-        if CURRENT_ALGO != best_algo['name']:
-            CURRENT_ALGO = best_algo['name']
-            kill_process(current_miner)
-            sleep(3)
-            current_miner = start_nicehash_mining(best_algo)
-        sleep(60)
 
 
 if __name__ == "__main__":
-	endless_miner()
+	best_algo = nicehash_best_algo()
+	current_miner = start_nicehash_mining(best_algo)
+	while True:
+		for i in range(3):
+			sleep(60)
+			get_nicehash_stat(best_algo['algo'])
+		new_algo = nicehash_best_algo()
+		if new_algo['name'] != best_algo['name']:
+			best_algo = new_algo
+			kill_process(current_miner)
+			sleep(5)
+			current_miner = start_nicehash_mining(best_algo)
+
