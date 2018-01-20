@@ -94,7 +94,10 @@ def get_nicehash_stat(algo_id):
 	req = requests.get(API_URL, params=payload)
 	reqResult = req.json()['result']
 	workers = reqResult['workers']
-	hash_speed = str(workers[0][1]['a'])
+	try:
+		hash_speed = str(workers[0][1]['a'])
+	except:
+		hash_speed = 0
 	print "%s %s" %(hash_speed, unit)
 
 
@@ -103,7 +106,7 @@ if __name__ == "__main__":
 	best_algo = nicehash_best_algo()
 	current_miner = start_nicehash_mining(best_algo)
 	while True:
-		for i in range(3):
+		for i in range(2):
 			sleep(60)
 			get_nicehash_stat(best_algo['algo'])
 		new_algo = nicehash_best_algo()
