@@ -16,6 +16,9 @@ CONFIG = os.path.join(WORK_DIR, 'config.txt')
 COINS = os.path.join(WORK_DIR, 'coins.conf')
 
 
+def cur_time():
+	return datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
+
 def kill_process(processName):
 	cmdStr = "taskkill /f /im %s" %(processName)
 	os.system(cmdStr)
@@ -47,7 +50,9 @@ def get_best_coin():
 			profit = value["profitability"]
 			best_coin = value['tag']
 			algo = value['algorithm']
-	print "Current best coin %s with %s" %(best_coin, algo) 
+	#print "The Actual best coin is %s " %best_coin
+	if best_coin in MY_COINS:
+		return best_coin
 	rez = sorted(best_dict.items(), key=operator.itemgetter(1), reverse=True)
 	for i in rez:
 		best_coin = i[0]
@@ -69,7 +74,7 @@ def start_mining_coin(coin):
 	miner_bin = cfg.get('ALGO', algo)
 	if algo == 'equihash':
 		# EWBF Zcash CUDA miner
-		cmdStr = "%s --server %s --port %s --user %s.%s --api 0.0.0.0:42000 --fee 0" %(miner_bin, pool, port, user, worker)
+		cmdStr = "%s --server %s --port %s --user %s.%s --api 127.0.0.1:42000 --fee 0" %(miner_bin, pool, port, user, worker)
 	elif algo == 'cryptonight':
 		# XMR-STAK
 		pass
@@ -81,26 +86,29 @@ def start_mining_coin(coin):
 		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, port, user, worker)
 	try:
 		proc = Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
-		print datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
-		print "[+] Successfully started mining %s on %s algorithm\n" %(coin, algo.upper())
-		sleep(3)
+		#print "[+] [%s] Successfully started mining %s on %s algorithm\n" %(cur_time(), coin, algo.upper())
+		#sleep(3)
 		return os.path.basename(miner_bin)
 	except:
 		print "[-] ERROR starting %s miner" %coin
 		return False
 
-	print 'Started mining coin %s' %coin
-
 
 
 if __name__ == "__main__":
 	best_coin = get_best_coin()
+	print "\n", cur_time()
+	print "[i] My current most profitable coin is %s" %best_coin
 	process = start_mining_coin(best_coin)
+	print "[+] Start mining %s" %best_coin
 	while True:
-		sleep(900)
+		sleep(600)
 		new_coin = get_best_coin()
 		if new_coin != best_coin:
 			best_coin = new_coin
+			print '\n', cur_time()
+			print "[i] New most profitable coin is %s" %new_coin
 			kill_process(process)
 			sleep(5)
+			print "[+] Switching to mine %s" %best_coin
 			process = start_mining_coin(best_coin)

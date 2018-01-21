@@ -68,10 +68,9 @@ def start_nicehash_mining(algo):
 		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo['name'], pool, port, user, worker)
 	try:
 		proc = Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
-		current_time = datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
-		print "\n[%s] Current NiceHash Best Algo: %s" %(current_time, best_algo['name'])
+		print "\n", datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
+		print "[i] Current NiceHash Best Algo: %s" %(best_algo['name'])
 		print "[+] Successfully started mining on %s algorithm\n" %(algo['name'])
-		sleep(3)
 		return os.path.basename(miner_bin)
 	except:
 		print "[-] ERROR starting miner"
