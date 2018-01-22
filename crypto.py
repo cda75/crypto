@@ -42,28 +42,22 @@ def get_best_coin():
 	MY_COINS = cfg.sections()
 	req = requests.get(JSON_URL)
 	reqResult = req.json()['coins']
-	profit = 0
 	best_dict = {}
 	for coin, value in reqResult.iteritems():
-		best_dict[value['tag']] = value['profitability']
-		if value["profitability"] > profit:
-			profit = value["profitability"]
-			best_coin = value['tag']
-			algo = value['algorithm']
-	#print "The Actual best coin is %s " %best_coin
-	if best_coin in MY_COINS:
-		return best_coin
+		best_dict[coin] = value['profitability']
 	rez = sorted(best_dict.items(), key=operator.itemgetter(1), reverse=True)
 	for i in rez:
-		best_coin = i[0]
-		if best_coin in MY_COINS:
-			return best_coin
+		coin_name = i[0]
+		coin_tag = reqResult[coin_name]['tag']
+		coin_algo = reqResult[coin_name]['algorithm']
+		if coin_tag in MY_COINS:
+			return coin_tag.upper(), coin_algo.lower()
 
 
-def start_mining_coin(coin):
+def start_mining_coin(coin, algo):
 	cfg = SafeConfigParser()
 	cfg.read(COINS)
-	algo = cfg.get(coin, 'ALGO')
+	#algo = cfg.get(coin, 'ALGO')
 	user = cfg.get(coin, 'USER')
 	addr = cfg.get(coin, 'ADDR')
 	pool = cfg.get(coin, 'POOL')
@@ -96,19 +90,22 @@ def start_mining_coin(coin):
 
 
 if __name__ == "__main__":
-	best_coin = get_best_coin()
+	coin, algo = get_best_coin()
 	print "\n", cur_time()
-	print "[i] My current most profitable coin is %s" %best_coin
-	process = start_mining_coin(best_coin)
-	print "[+] Start mining %s" %best_coin
+	print "[i] My current most profitable coin is %s" %coin
+	process = start_mining_coin(coin, algo)
+	print "[+] Start mining %s" %coin
 	while True:
 		sleep(3600)
-		new_coin = get_best_coin()
-		if new_coin != best_coin:
-			best_coin = new_coin
+		new_coin, new_algo = get_best_coin()
+		if new_coin != coin:
+			coin = new_coin
+			algo = new_algo
 			print '\n', cur_time()
 			print "[i] New most profitable coin is %s" %new_coin
 			kill_process(process)
 			sleep(5)
-			print "[+] Switching to mine %s" %best_coin
-			process = start_mining_coin(best_coin)
+			print "[+] Switching to mine %s" %coin
+			process = start_mining_coin(coin, algo)
+
+
