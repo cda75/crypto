@@ -56,7 +56,7 @@ def start_nicehash_mining(algo):
 	port = algo['port']
 	if algo['name'] == 'equihash':
 		# EWBF Zcash CUDA miner
-		cmdStr = "%s --server %s --port %s --user %s.%s --api 127.0.0.1:42000 --fee 0" %(miner_bin, pool, port, user, worker)
+		cmdStr = "%s --server %s --port %s --user %s.%s --api 192.168.0.5:42000 --fee 0" %(miner_bin, pool, port, user, worker)
 	elif algo['name'] == 'cryptonight':
 		# XMR-STAK
 		pass

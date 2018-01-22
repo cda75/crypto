@@ -74,7 +74,7 @@ def start_mining_coin(coin):
 	miner_bin = cfg.get('ALGO', algo)
 	if algo == 'equihash':
 		# EWBF Zcash CUDA miner
-		cmdStr = "%s --server %s --port %s --user %s.%s --api 127.0.0.1:42000 --fee 0" %(miner_bin, pool, port, user, worker)
+		cmdStr = "%s --server %s --port %s --user %s.%s --api 192.168.0.5:42000 --fee 0" %(miner_bin, pool, port, user, worker)
 	elif algo == 'cryptonight':
 		# XMR-STAK
 		pass
@@ -102,7 +102,7 @@ if __name__ == "__main__":
 	process = start_mining_coin(best_coin)
 	print "[+] Start mining %s" %best_coin
 	while True:
-		sleep(600)
+		sleep(3600)
 		new_coin = get_best_coin()
 		if new_coin != best_coin:
 			best_coin = new_coin
