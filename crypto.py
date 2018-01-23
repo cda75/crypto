@@ -72,7 +72,7 @@ def start_mining_coin(coin, algo):
 		return os.path.basename(miner_bin)
 	except:
 		print "[-] ERROR starting %s miner. \nExit" %coin
-		exit()
+		#exit()
 
 
 

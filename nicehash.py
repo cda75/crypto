@@ -105,9 +105,7 @@ if __name__ == "__main__":
 	best_algo = nicehash_best_algo()
 	current_miner = start_nicehash_mining(best_algo)
 	while True:
-		for i in range(2):
-			sleep(60)
-			get_nicehash_stat(best_algo['algo'])
+		sleep(150)
 		new_algo = nicehash_best_algo()
 		if new_algo['name'] != best_algo['name']:
 			best_algo = new_algo
