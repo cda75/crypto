@@ -14,10 +14,9 @@ import operator
 WORK_DIR = os.path.dirname(os.path.realpath(__file__))
 CONFIG = os.path.join(WORK_DIR, 'config.txt')
 COINS = os.path.join(WORK_DIR, 'coins.conf')
+BENCHMARK = os.path.join(WORK_DIR, 'benchmark.conf')
+NICEHASH = os.path.join(WORK_DIR, 'nicehash.conf')
 
-
-def cur_time():
-	return datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
 
 def kill_process(processName):
 	cmdStr = "taskkill /f /im %s" %(processName)
@@ -29,24 +28,26 @@ def get_best_coin():
 	cfg = SafeConfigParser()
 	cfg.read(COINS)
 	MY_COINS = cfg.sections()
-	req = requests.get(JSON_URL)
-	reqResult = req.json()['coins']
-	best_dict = {}
-	for coin, value in reqResult.iteritems():
-		best_dict[coin] = value['profitability']
-	rez = sorted(best_dict.items(), key=operator.itemgetter(1), reverse=True)
-	for i in rez:
-		coin_name = i[0]
-		coin_tag = reqResult[coin_name]['tag']
-		coin_algo = reqResult[coin_name]['algorithm']
-		if coin_tag in MY_COINS:
-			return coin_tag.upper(), coin_algo.lower()
+	try:
+		req = requests.get(JSON_URL)
+		reqResult = req.json()['coins']
+		best_dict = {}
+		for coin, value in reqResult.iteritems():
+			best_dict[coin] = value['profitability']
+		rez = sorted(best_dict.items(), key=operator.itemgetter(1), reverse=True)
+		for i in rez:
+			coin_name = i[0]
+			coin_tag = reqResult[coin_name]['tag']
+			coin_algo = reqResult[coin_name]['algorithm']
+			if coin_tag in MY_COINS:
+				return coin_tag.upper(), coin_algo.lower()
+	except ValueError:
+		return 'ZEC', 'equihash'
 
 
-def start_mining_coin(coin, algo):
+def start_coin_mining(coin, algo):
 	cfg = SafeConfigParser()
 	cfg.read(COINS)
-	#algo = cfg.get(coin, 'ALGO')
 	user = cfg.get(coin, 'USER')
 	addr = cfg.get(coin, 'ADDR')
 	pool = cfg.get(coin, 'POOL')
@@ -75,26 +76,124 @@ def start_mining_coin(coin, algo):
 		#exit()
 
 
-
-if __name__ == "__main__":
+def coin_mining(t1=10, t2=8):
 	coin, algo = get_best_coin()
 	print "\n", datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
 	print "[i] My current most profitable coin is %s" %coin
-	process = start_mining_coin(coin, algo)
+	process = start_coin_mining(coin, algo)
 	if process:
 		print "[+] Start mining %s" %coin
-	while True:
-		sleep(3600)
+	for i in range(60/t1*t2):
+		sleep(t1*60)
 		new_coin, new_algo = get_best_coin()
 		if new_coin != coin:
-			coin = new_coin
-			algo = new_algo
 			print '\n', datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
 			print "[i] New most profitable coin is %s" %new_coin
 			kill_process(process)
 			sleep(5)
-			process = start_mining_coin(coin, algo)
+			process = start_coin_mining(new_coin, new_algo)
 			if process:
-				print "[+] Switching to mine %s" %coin
+				print "[+] Switching to mine %s" %new_coin
+				coin = new_coin
+
+
+def nicehash_best_algo():
+	cfg = SafeConfigParser()
+	cfg.read(BENCHMARK)
+	algo_dict = dict(cfg.items('DEFAULT'))
+	my_algo = algo_dict.keys()
+	best_value = 0
+	cfg.read(NICEHASH)
+	API_URL = cfg.get('DEFAULT', 'API_URL')
+	payload = {'method': cfg.get('DEFAULT', 'METHOD')}
+	try:
+		req = requests.get(API_URL, params=payload)
+		reqResult = req.json()['result']
+		rez =  reqResult['simplemultialgo']
+		for i in rez:
+			algo_name = i['name'].strip()
+			if algo_name in my_algo:
+				algo_price = float(i["paying"])
+				algo_speed = long(algo_dict[algo_name])
+				algo_value = algo_price*algo_speed
+				if algo_value > best_value:
+					best_value = algo_value
+					best_algo = i
+		return best_algo
+	except ValueError:
+		return 'equihash'
+
+
+def start_nicehash_mining(algo):
+	cfg = SafeConfigParser()
+	cfg.read(CONFIG)
+	miner_bin = cfg.get('ALGO', algo['name'])
+	cfg.read(NICEHASH)
+	pool = cfg.get('DEFAULT', algo['name'])
+	user = cfg.get('DEFAULT', 'ADDR')
+	worker = cfg.get('DEFAULT', 'WORKER')
+	port = algo['port']
+	if algo['name'] == 'equihash':
+		# EWBF Zcash CUDA miner
+		cmdStr = "%s --server %s --port %s --user %s.%s --api 192.168.0.5:42000 --fee 0" %(miner_bin, pool, port, user, worker)
+	elif algo['name'] == 'cryptonight':
+		# XMR-STAK
+		pass
+	elif algo['name'] == 'ethash':
+		# CLAYMOR DUAL miner
+		cmdStr = "%s -epool %s:%s -ewal %s.%s -epsw %s" %(miner_bin, pool, port, user, worker, password)
+	else:
+		# CCMINER
+		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo['name'], pool, port, user, worker)
+	try:
+		proc = Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
+		print "\n", datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
+		print "[i] Current NiceHash Best Algo: %s" %(best_algo['name'])
+		print "[+] Successfully started mining on %s algorithm\n" %(algo['name'])
+		return os.path.basename(miner_bin)
+	except:
+		print "[-] ERROR starting miner"
+		return False
+
+
+def nicehash_stat(algo_id):
+	if algo_id in [8,14,29]:
+		unit = 'MH/s'
+	elif algo_id in [23,28]:
+		unit = 'GH/s'
+	else:
+		unit = 'H/s'
+	cfg = SafeConfigParser()
+	cfg.read(NICEHASH)
+	API_URL = cfg.get('DEFAULT', 'API_URL')
+	method = 'stats.provider.workers'
+	ADDR = cfg.get('DEFAULT', 'ADDR')
+	payload = {'method':method, 'addr':ADDR, 'algo':algo_id}
+	req = requests.get(API_URL, params=payload)
+	reqResult = req.json()['result']
+	workers = reqResult['workers']
+	try:
+		hash_speed = str(workers[0][1]['a'])
+	except:
+		hash_speed = 0
+	print "%s %s" %(hash_speed, unit)
+
+
+def nicehash_mining(t1=1,t2=8):
+	best_algo = nicehash_best_algo()
+	current_miner = start_nicehash_mining(best_algo)
+	for i in range(60/t1*t2):
+		sleep(t1*60)
+		new_algo = nicehash_best_algo()
+		if new_algo['name'] != best_algo['name']:
+			kill_process(current_miner)
+			sleep(5)
+			current_miner = start_nicehash_mining(best_algo)
+			best_algo = new_algo
+
+
+if __name__ == "__main__":
+	best_coin_mining()
+	
 
 
