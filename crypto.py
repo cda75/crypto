@@ -95,6 +95,8 @@ def coin_mining(t1=10, t2=8):
 			if process:
 				print "[+] Switching to mine %s" %new_coin
 				coin = new_coin
+	kill_process(process)
+	print "[+] Stop coin mining"
 
 
 def nicehash_best_algo():
@@ -190,6 +192,8 @@ def nicehash_mining(t1=1,t2=8):
 			sleep(5)
 			current_miner = start_nicehash_mining(best_algo)
 			best_algo = new_algo
+	kill_process(current_miner)
+	print "[+] Stop nicehash mining"
 
 
 if __name__ == "__main__":
