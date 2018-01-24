@@ -16,13 +16,21 @@ CONFIG = os.path.join(WORK_DIR, 'config.txt')
 COINS = os.path.join(WORK_DIR, 'coins.conf')
 BENCHMARK = os.path.join(WORK_DIR, 'benchmark.conf')
 NICEHASH = os.path.join(WORK_DIR, 'nicehash.conf')
+LOG = os.path.join(WORK_DIR, 'mining.log')
+
+
+def logging(info):
+	print info
+	with open(LOG, 'a') as f:
+		f.write(info+'\n')
 
 
 def cur_time(func):
-	def format():
-		print "\n[%s]" %datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
+	def format(*args, **kwargs):
+		time = "\n[%s]" %datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
+		logging(time)
 		return func()
-		print "\n[%s]" %datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
+		logging(time)
 	return format
 
 
@@ -50,6 +58,7 @@ def get_best_coin():
 			if coin_tag in MY_COINS:
 				return coin_tag.upper(), coin_algo.lower()
 	except ValueError:
+		logging("Error getting info....Mining ZEC")
 		return 'ZEC', 'equihash'
 
 
@@ -76,7 +85,7 @@ def start_coin_mining(coin, algo):
 	else:
 		# CCMINER
 		if coin == 'XVG':
-			pool = cfg.get('XVG',algo)
+			pool = cfg.get('XVG', algo)
 			if algo == 'myriad-groestl':
 				cmdStr = "%s -a myr-gr -o %s -u %s.%s --cpu-priority=3" %(miner_bin, pool, user, worker)
 			else:
@@ -87,30 +96,31 @@ def start_coin_mining(coin, algo):
 		proc = Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
 		return os.path.basename(miner_bin)
 	except:
-		print "[-] ERROR starting %s miner. \nExit" %coin
+		logging("[-] ERROR starting %s miner" %coin)
 		#exit()
 
 @cur_time
 def coin_mining(t1=10, t2=8):
 	coin, algo = get_best_coin()
-	print "[i] My current most profitable coin is %s" %coin
+	logging("[i] My current most profitable coin is %s" %coin)
 	process = start_coin_mining(coin, algo)
 	if process:
-		print "[+] Start mining %s" %coin
+		logging("[+] Start mining %s" %coin)
 	for i in range(60/t1*t2):
 		sleep(t1*60)
 		new_coin, new_algo = get_best_coin()
 		if new_coin != coin:
-			print "\n[%s]" %datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
-			print "[i] New most profitable coin is %s" %new_coin
+			time = "\n[%s]\n" %datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
+			info = "[i] New most profitable coin is %s" %new_coin
+			logging(time+info)
 			kill_process(process)
 			sleep(5)
 			process = start_coin_mining(new_coin, new_algo)
 			if process:
-				print "[+] Switching to mine %s" %new_coin
+				logging("[+] Switching to mine %s" %new_coin)
 				coin = new_coin
 	kill_process(process)
-	print "[+] Stop coin mining"
+	logging("[+] Stop coin mining")
 
 
 def nicehash_best_algo():
