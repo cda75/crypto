@@ -76,7 +76,9 @@ def start_coin_mining(coin, algo):
 	else:
 		# CCMINER
 		if coin == 'XVG':
-			algo == 
+			pool = cfg.get('XVG',algo)
+			if algo == 'myriad-groestl':
+				cmdStr = "%s -a myr-gr -o %s -u %s.%s --cpu-priority=3" %(miner_bin, pool, user, worker)
 		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, port, user, worker)
 	try:
 		proc = Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
