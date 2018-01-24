@@ -18,8 +18,12 @@ BENCHMARK = os.path.join(WORK_DIR, 'benchmark.conf')
 NICEHASH = os.path.join(WORK_DIR, 'nicehash.conf')
 
 
-def cur_time():
-	print "\n[%s]" %datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
+def cur_time(func):
+	def format():
+		print "\n[%s]" %datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
+		return func()
+		print "\n[%s]" %datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
+	return format
 
 
 def kill_process(processName):
@@ -79,10 +83,9 @@ def start_coin_mining(coin, algo):
 		print "[-] ERROR starting %s miner. \nExit" %coin
 		#exit()
 
-
+@cur_time
 def coin_mining(t1=10, t2=8):
 	coin, algo = get_best_coin()
-	cur_time()
 	print "[i] My current most profitable coin is %s" %coin
 	process = start_coin_mining(coin, algo)
 	if process:
@@ -100,7 +103,6 @@ def coin_mining(t1=10, t2=8):
 				print "[+] Switching to mine %s" %new_coin
 				coin = new_coin
 	kill_process(process)
-	cur_time()
 	print "[+] Stop coin mining"
 
 
@@ -131,7 +133,7 @@ def nicehash_best_algo():
 		print 'Oooops. Error getting data from NiceHash'
 		return 'equihash'
 
-
+@cur_time
 def start_nicehash_mining(algo):
 	cfg = SafeConfigParser()
 	cfg.read(CONFIG)
@@ -203,7 +205,8 @@ def nicehash_mining(t1=1,t2=8):
 
 
 if __name__ == "__main__":
-	best_coin_mining()
+	while True:
+		coin_mining()
 	
 
 
