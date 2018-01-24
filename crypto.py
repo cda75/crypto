@@ -55,6 +55,8 @@ def get_best_coin():
 
 def start_coin_mining(coin, algo):
 	cfg = SafeConfigParser()
+	cfg.read(CONFIG)
+	miner_bin = cfg.get('ALGO', algo)
 	cfg.read(COINS)
 	user = cfg.get(coin, 'USER')
 	addr = cfg.get(coin, 'ADDR')
@@ -62,8 +64,6 @@ def start_coin_mining(coin, algo):
 	port = cfg.get(coin, 'PORT')
 	worker = cfg.get(coin, 'WORKER')
 	password = cfg.get(coin, 'PASSWORD')
-	cfg.read(CONFIG)
-	miner_bin = cfg.get('ALGO', algo)
 	if algo == 'equihash':
 		# EWBF Zcash CUDA miner
 		cmdStr = "%s --server %s --port %s --user %s.%s --api 192.168.0.5:42000 --fee 0" %(miner_bin, pool, port, user, worker)
@@ -75,6 +75,8 @@ def start_coin_mining(coin, algo):
 		cmdStr = "%s -epool %s:%s -ewal %s.%s -epsw %s" %(miner_bin, pool, port, user, worker, password)
 	else:
 		# CCMINER
+		if coin == 'XVG':
+			algo == 
 		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, port, user, worker)
 	try:
 		proc = Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)

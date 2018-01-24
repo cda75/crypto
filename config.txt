@@ -9,6 +9,8 @@ scrypt = %(lyra2rev2)s
 blake2s = %(lyra2rev2)s
 pascal = %(lyra2rev2)s
 lbry = %(lyra2rev2)s
+x17 = %(lyra2rev2)s
+myriad-groestl = %(lyra2rev2)s
 
 [OVERCLOCK]
 PATH = C:\Program Files (x86)\MSI Afterburner\MSIAfterburner.exe
