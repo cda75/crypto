@@ -18,6 +18,10 @@ BENCHMARK = os.path.join(WORK_DIR, 'benchmark.conf')
 NICEHASH = os.path.join(WORK_DIR, 'nicehash.conf')
 
 
+def cur_time():
+	print "\n[%s]" %datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
+
+
 def kill_process(processName):
 	cmdStr = "taskkill /f /im %s" %(processName)
 	os.system(cmdStr)
@@ -78,7 +82,7 @@ def start_coin_mining(coin, algo):
 
 def coin_mining(t1=10, t2=8):
 	coin, algo = get_best_coin()
-	print "\n", datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
+	cur_time()
 	print "[i] My current most profitable coin is %s" %coin
 	process = start_coin_mining(coin, algo)
 	if process:
@@ -96,6 +100,7 @@ def coin_mining(t1=10, t2=8):
 				print "[+] Switching to mine %s" %new_coin
 				coin = new_coin
 	kill_process(process)
+	cur_time()
 	print "[+] Stop coin mining"
 
 
@@ -150,7 +155,7 @@ def start_nicehash_mining(algo):
 		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo['name'], pool, port, user, worker)
 	try:
 		proc = Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
-		print "\n[%s]" %datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
+		cur_time()
 		print "[i] Current NiceHash Best Algo: %s" %(algo['name'])
 		print "[+] Successfully started mining on %s algorithm\n" %(algo['name'])
 		return os.path.basename(miner_bin)
