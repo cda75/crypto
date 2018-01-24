@@ -58,8 +58,6 @@ def start_coin_mining(coin, algo):
 	cfg.read(CONFIG)
 	miner_bin = cfg.get('ALGO', algo)
 	cfg.read(COINS)
-	if coin == 'XVG':
-		algo = cfg.get(coin,'ALGO')
 	user = cfg.get(coin, 'USER')
 	addr = cfg.get(coin, 'ADDR')
 	pool = cfg.get(coin, 'POOL')
@@ -81,7 +79,10 @@ def start_coin_mining(coin, algo):
 			pool = cfg.get('XVG',algo)
 			if algo == 'myriad-groestl':
 				cmdStr = "%s -a myr-gr -o %s -u %s.%s --cpu-priority=3" %(miner_bin, pool, user, worker)
-		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, port, user, worker)
+			else:
+				cmdStr = "%s -a %s -o %s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, user, worker)
+		else:
+			cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, port, user, worker)
 	try:
 		proc = Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
 		return os.path.basename(miner_bin)
@@ -211,12 +212,8 @@ def nicehash_mining(t1=1,t2=8):
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
-	start_coin_mining('XVG','Myriad-Groestl')
-=======
 	while True:
 		coin_mining()
->>>>>>> 469a4043ea1549decdf0f57b4ada950377400cf2
-	
+
 
 
