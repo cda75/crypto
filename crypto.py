@@ -52,6 +52,8 @@ def get_best_coin():
 def start_coin_mining(coin, algo):
 	cfg = SafeConfigParser()
 	cfg.read(COINS)
+	if coin == 'XVG':
+		algo = cfg.get(coin,'ALGO')
 	user = cfg.get(coin, 'USER')
 	addr = cfg.get(coin, 'ADDR')
 	pool = cfg.get(coin, 'POOL')
@@ -203,7 +205,7 @@ def nicehash_mining(t1=1,t2=8):
 
 
 if __name__ == "__main__":
-	best_coin_mining()
+	start_coin_mining('XVG','Myriad-Groestl')
 	
 
 

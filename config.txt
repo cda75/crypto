@@ -3,6 +3,7 @@ equihash = C:\Users\root\CryptoPro\ewbf\miner.exe
 ethash = C:\Users\root\CryptoPro\claymor\EthDcrMiner64.exe
 cryptonight = C:\Users\root\CryptoPro\xmr-stak\xmr-stak.exe
 lyra2rev2 = C:\Users\root\CryptoPro\ccminer\ccminer-x64.exe
+x17 = %(lyra2rev2)s
 skunk = %(lyra2rev2)s
 neoscrypt = %(lyra2rev2)s
 scrypt = %(lyra2rev2)s
