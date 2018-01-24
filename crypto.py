@@ -87,7 +87,7 @@ def coin_mining(t1=10, t2=8):
 		sleep(t1*60)
 		new_coin, new_algo = get_best_coin()
 		if new_coin != coin:
-			print '\n', datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
+			print "\n[%s]" %datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
 			print "[i] New most profitable coin is %s" %new_coin
 			kill_process(process)
 			sleep(5)
@@ -123,6 +123,7 @@ def nicehash_best_algo():
 					best_algo = i
 		return best_algo
 	except ValueError:
+		print 'Oooops. Error getting data from NiceHash'
 		return 'equihash'
 
 
@@ -149,8 +150,8 @@ def start_nicehash_mining(algo):
 		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo['name'], pool, port, user, worker)
 	try:
 		proc = Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
-		print "\n", datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
-		print "[i] Current NiceHash Best Algo: %s" %(best_algo['name'])
+		print "\n[%s]" %datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
+		print "[i] Current NiceHash Best Algo: %s" %(algo['name'])
 		print "[+] Successfully started mining on %s algorithm\n" %(algo['name'])
 		return os.path.basename(miner_bin)
 	except:
@@ -184,7 +185,7 @@ def nicehash_stat(algo_id):
 def nicehash_mining(t1=1,t2=8):
 	best_algo = nicehash_best_algo()
 	current_miner = start_nicehash_mining(best_algo)
-	for i in range(60/t1*t2):
+	for i in range(int(60/t1*t2)):
 		sleep(t1*60)
 		new_algo = nicehash_best_algo()
 		if new_algo['name'] != best_algo['name']:
