@@ -20,20 +20,11 @@ LOG = os.path.join(WORK_DIR, 'mining.log')
 
 
 def logging(info):
-	time = "[%s]\n" %datetime.strftime(datetime.now(), "%d-%M %H:%M")
+	time = "[%s] " %datetime.strftime(datetime.now(), "%d/%m %H:%M:%S")
 	print time+info
 	with open(LOG, 'a') as f:
 		f.write(time+info+'\n')
 
-'''
-def cur_time(func):
-	def format(*args, **kwargs):
-		time = "\n[%s]" %datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
-		logging(time)
-		return func(*args, **kwargs)
-		logging(time)
-	return format
-'''
 
 def kill_process(processName):
 	cmdStr = "taskkill /f /im %s" %(processName)
@@ -107,7 +98,7 @@ def coin_mining(t1=10, t2=8):
 	process = start_coin_mining(coin, algo)
 	if process:
 		logging("[+] Start mining %s" %coin)
-	for i in range(60/t1*t2):
+	for i in range(int(60/t1*t2)):
 		sleep(t1*60)
 		new_coin, new_algo = get_best_coin()
 		if new_coin != coin:
@@ -120,6 +111,7 @@ def coin_mining(t1=10, t2=8):
 				coin = new_coin
 	kill_process(process)
 	logging("[+] Stop coin mining")
+	logging("---------------------------------------------------------------------\n")
 
 
 def nicehash_best_algo():
@@ -149,7 +141,7 @@ def nicehash_best_algo():
 		logging('Oooops. Error getting data from NiceHash\nMining on Equihash algo')
 		return 'equihash'
 
-@cur_time
+
 def start_nicehash_mining(algo):
 	cfg = SafeConfigParser()
 	cfg.read(CONFIG)
@@ -217,6 +209,7 @@ def nicehash_mining(t1=1,t2=8):
 			best_algo = new_algo
 	kill_process(current_miner)
 	logging("[+] Stop nicehash mining")
+	logging("----------------------------------------------------------------------\n")
 
 
 if __name__ == "__main__":
