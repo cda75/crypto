@@ -29,7 +29,7 @@ def cur_time(func):
 	def format(*args, **kwargs):
 		time = "\n[%s]" %datetime.strftime(datetime.now(), "%d.%m.%y %H:%M")
 		logging(time)
-		return func()
+		return func(*args, **kwargs)
 		logging(time)
 	return format
 
