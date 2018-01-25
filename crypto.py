@@ -120,7 +120,7 @@ def coin_mining(t1=30, t2=12):
 		sleep(t1*60)
 		new_coin, new_algo = get_best_coin()
 		if new_coin == coin:
-			logging("Continue mining %s\n" %coin)
+			logging("[+] Continue mining %s\n" %coin)
 		else:
 			logging("[i] New most profitable coin is %s" %new_coin)
 			kill_current_miner()
