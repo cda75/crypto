@@ -41,7 +41,7 @@ def write_pid(pid):
 
 def write_coin(coin):
 	with open(COIN, 'w') as f:
-		f.write(COIN)
+		f.write(coin)
 
 
 def get_pid():
