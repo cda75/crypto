@@ -37,7 +37,7 @@ def get_best_coin():
 	cfg.read(COINS)
 	MY_COINS = cfg.sections()
 	try:
-		logging("Checking best coin...")
+		logging("[i] Checking best coin...")
 		req = requests.get(JSON_URL)
 		reqResult = req.json()['coins']
 		best_dict = {}
@@ -79,10 +79,7 @@ def start_coin_mining(coin, algo):
 		# CCMINER
 		if coin == 'XVG':
 			pool = cfg.get('XVG', algo)
-			if algo == 'myriad-groestl':
-				cmdStr = "%s -a myr-gr -o %s -u %s.%s --cpu-priority=3" %(miner_bin, pool, user, worker)
-			else:
-				cmdStr = "%s -a %s -o %s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, user, worker)
+			cmdStr = "%s -a %s -o %s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, user, worker)
 		else:
 			cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, port, user, worker)
 	try:
@@ -98,7 +95,7 @@ def coin_mining(t1=10, t2=8):
 	logging("[i] My current most profitable coin is %s" %coin)
 	process = start_coin_mining(coin, algo)
 	if process:
-		logging("[+] Start mining %s" %coin)
+		logging("[+] Start mining %s\n" %coin)
 	for i in range(int(60/t1*t2)):
 		sleep(t1*60)
 		new_coin, new_algo = get_best_coin()
@@ -108,7 +105,7 @@ def coin_mining(t1=10, t2=8):
 			sleep(5)
 			process = start_coin_mining(new_coin, new_algo)
 			if process:
-				logging("[+] Switching to mine %s" %new_coin)
+				logging("[+] Switching to mine %s\n" %new_coin)
 				coin = new_coin
 	kill_process(process)
 	logging("[+] Stop coin mining")
