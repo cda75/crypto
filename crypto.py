@@ -4,7 +4,7 @@ import requests
 import os
 from datetime import datetime
 from time import sleep
-from subprocess import Popen, CREATE_NEW_CONSOLE
+from subprocess import Popen, PIPE, CREATE_NEW_CONSOLE
 import psutil
 from ConfigParser import SafeConfigParser 
 import operator
@@ -17,6 +17,7 @@ COINS = os.path.join(WORK_DIR, 'coins.conf')
 BENCHMARK = os.path.join(WORK_DIR, 'benchmark.conf')
 NICEHASH = os.path.join(WORK_DIR, 'nicehash.conf')
 LOG = os.path.join(WORK_DIR, 'mining.log')
+PID = os.path.join(WORK_DIR, 'PID')
 
 
 def logging(info):
@@ -26,9 +27,28 @@ def logging(info):
 		f.write(time+info+'\n')
 
 
-def kill_process(processName):
-	cmdStr = "taskkill /f /im %s" %(processName)
+def kill_current_miner():
+	pid = get_pid()
+	cmdStr = "taskkill /f /im %s" %(pid)
 	os.system(cmdStr)
+
+
+def write_pid(pid):
+	with open(PID, 'w') as f:
+		f.write(pid)
+
+
+def get_pid():
+	with open(PID) as f:
+		pid = f.read()
+	return pid
+
+
+def check_pid(pid):
+	if pid in Popen('tasklist', stdout=PIPE).communicate()[0]:
+		return True
+	else:
+		return False
 
 
 def get_best_coin():
@@ -83,31 +103,32 @@ def start_coin_mining(coin, algo):
 		else:
 			cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, port, user, worker)
 	try:
-		proc = Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
-		return os.path.basename(miner_bin)
+		Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
+		pid = os.path.basename(miner_bin)
+		write_pid(pid)
+		logging("[+] Successfully started %s mining\n" %coin)
 	except:
-		logging("[-] ERROR starting %s miner" %coin)
-		#exit()
+		logging("[-] ERROR starting %s miner\nExit\n" %coin)
+		exit()
 
 
-def coin_mining(t1=10, t2=8):
+def coin_mining(t1=30, t2=12):
 	coin, algo = get_best_coin()
 	logging("[i] My current most profitable coin is %s" %coin)
-	process = start_coin_mining(coin, algo)
-	if process:
-		logging("[+] Start mining %s\n" %coin)
+	start_coin_mining(coin, algo)
 	for i in range(int(60/t1*t2)):
 		sleep(t1*60)
 		new_coin, new_algo = get_best_coin()
-		if new_coin != coin:
+		if new_coin == coin:
+			logging("Continue mining %s\n" %coin)
+		else:
 			logging("[i] New most profitable coin is %s" %new_coin)
-			kill_process(process)
+			kill_current_miner()
 			sleep(5)
-			process = start_coin_mining(new_coin, new_algo)
-			if process:
-				logging("[+] Switching to mine %s\n" %new_coin)
-				coin = new_coin
-	kill_process(process)
+			logging("[+] Switching to mine %s\n" %new_coin)
+			start_coin_mining(new_coin, new_algo)
+			coin = new_coin
+	kill_current_miner()
 	logging("[+] Stop coin mining")
 	logging("---------------------------------------------------------------------\n")
 
@@ -136,7 +157,7 @@ def nicehash_best_algo():
 					best_algo = i
 		return best_algo
 	except ValueError:
-		logging('Oooops. Error getting data from NiceHash\nMining on Equihash algo')
+		logging('[-] Oooops. Error getting data from NiceHash\nMining on Equihash algo')
 		return 'equihash'
 
 
@@ -162,57 +183,39 @@ def start_nicehash_mining(algo):
 		# CCMINER
 		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo['name'], pool, port, user, worker)
 	try:
-		proc = Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
-		logging("[i] Current NiceHash Best Algo: %s" %(algo['name']))
+		Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
 		logging("[+] Successfully started mining on %s algorithm\n" %(algo['name']))
-		return os.path.basename(miner_bin)
+		pid = os.path.basename(miner_bin)
+		write_pid(pid)
 	except:
-		logging("[-] ERROR starting miner %s" %cmdStr)
-		return False
-
-
-def nicehash_stat(algo_id):
-	if algo_id in [8,14,29]:
-		unit = 'MH/s'
-	elif algo_id in [23,28]:
-		unit = 'GH/s'
-	else:
-		unit = 'H/s'
-	cfg = SafeConfigParser()
-	cfg.read(NICEHASH)
-	API_URL = cfg.get('DEFAULT', 'API_URL')
-	method = 'stats.provider.workers'
-	ADDR = cfg.get('DEFAULT', 'ADDR')
-	payload = {'method':method, 'addr':ADDR, 'algo':algo_id}
-	req = requests.get(API_URL, params=payload)
-	reqResult = req.json()['result']
-	workers = reqResult['workers']
-	try:
-		hash_speed = str(workers[0][1]['a'])
-	except:
-		hash_speed = 0
-	logging("%s %s" %(hash_speed, unit))
+		logging("[-] ERROR starting miner %s\nExit" %cmdStr)
+		exit()
 
 
 def nicehash_mining(t1=1,t2=8):
 	best_algo = nicehash_best_algo()
-	current_miner = start_nicehash_mining(best_algo)
+	logging("[i] Current NiceHash best algo: %s" %(best_algo['name']))
+	start_nicehash_mining(best_algo)
 	for i in range(int(60/t1*t2)):
 		sleep(t1*60)
 		new_algo = nicehash_best_algo()
-		if new_algo['name'] != best_algo['name']:
-			kill_process(current_miner)
+		if new_algo['name'] == best_algo['name']:
+			logging("[i] Continue on current algo %s" %best_algo['name'])
+		else:
+			logging("[i] New NiceHash best algo is %s" %new_algo['name'])
+			kill_current_miner()
 			sleep(5)
-			current_miner = start_nicehash_mining(best_algo)
+			logging("[+] Switching to mine on %s algo\n" %new_algo)
+			start_nicehash_mining(new_algo)
 			best_algo = new_algo
-	kill_process(current_miner)
+	kill_current_miner()
 	logging("[+] Stop nicehash mining")
 	logging("----------------------------------------------------------------------\n")
 
 
 if __name__ == "__main__":
 	while True:
-		coin_mining()
+		coin_mining(t1=60)
 
 
 
