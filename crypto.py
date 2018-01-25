@@ -143,6 +143,7 @@ def nicehash_best_algo():
 	API_URL = cfg.get('DEFAULT', 'API_URL')
 	payload = {'method': cfg.get('DEFAULT', 'METHOD')}
 	try:
+		logging("[i] Checking best algo...")
 		req = requests.get(API_URL, params=payload)
 		reqResult = req.json()['result']
 		rez =  reqResult['simplemultialgo']
@@ -205,7 +206,7 @@ def nicehash_mining(t1=1,t2=8):
 			logging("[i] New NiceHash best algo is %s" %new_algo['name'])
 			kill_current_miner()
 			sleep(5)
-			logging("[+] Switching to mine on %s algo\n" %new_algo)
+			logging("[+] Switching to mine on %s algo\n" %new_algo['name'])
 			start_nicehash_mining(new_algo)
 			best_algo = new_algo
 	kill_current_miner()
