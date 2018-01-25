@@ -126,7 +126,7 @@ def coin_mining(t1=30, t2=12):
 			logging("[i] New most profitable coin is %s" %new_coin)
 			kill_current_miner()
 			sleep(5)
-			logging("[+] Switching to mine %s\n" %new_coin)
+			logging("[+] Switching to mine %s" %new_coin)
 			start_coin_mining(new_coin, new_algo)
 			coin = new_coin
 	kill_current_miner()
