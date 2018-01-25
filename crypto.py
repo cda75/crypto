@@ -37,6 +37,7 @@ def get_best_coin():
 	cfg.read(COINS)
 	MY_COINS = cfg.sections()
 	try:
+		logging("Checking best coin...")
 		req = requests.get(JSON_URL)
 		reqResult = req.json()['coins']
 		best_dict = {}
@@ -73,7 +74,7 @@ def start_coin_mining(coin, algo):
 		pass
 	elif algo == 'ethash':
 		# CLAYMOR DUAL miner
-		cmdStr = "%s -epool %s:%s -ewal %s.%s -epsw %s" %(miner_bin, pool, port, user, worker, password)
+		cmdStr = "%s -epool %s:%s -ewal %s.%s -epsw %s -allcoins 1 -allpools 1 -dpool stratum+tcp://hub.miningpoolhub.com:20550 -dwal %s.%s -dpsw x -dcoin sc" %(miner_bin, pool, port, user, worker, password, user, worker)
 	else:
 		# CCMINER
 		if coin == 'XVG':
