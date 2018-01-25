@@ -113,7 +113,7 @@ def start_coin_mining(coin, algo):
 
 
 def coin_mining(t1=30, t2=12):
-	logging("[i] Start coin minig")
+	logging("[i] Started coin mining")
 	coin, algo = get_best_coin()
 	logging("[i] My current most profitable coin is %s" %coin)
 	start_coin_mining(coin, algo)
@@ -195,7 +195,7 @@ def start_nicehash_mining(algo):
 
 
 def nicehash_mining(t1=1,t2=8):
-	logging("[i] Start NiceHash mining")
+	logging("[i] Started NiceHash mining")
 	best_algo = nicehash_best_algo()
 	logging("[i] Current NiceHash best algo: %s" %(best_algo['name']))
 	start_nicehash_mining(best_algo)
