@@ -18,6 +18,7 @@ BENCHMARK = os.path.join(WORK_DIR, 'benchmark.conf')
 NICEHASH = os.path.join(WORK_DIR, 'nicehash.conf')
 LOG = os.path.join(WORK_DIR, 'mining.log')
 PID = os.path.join(WORK_DIR, 'PID')
+COIN = os.path.join(WORK_DIR, 'COIN')
 
 
 def logging(info):
@@ -36,6 +37,11 @@ def kill_current_miner():
 def write_pid(pid):
 	with open(PID, 'w') as f:
 		f.write(pid)
+
+
+def write_coin(coin):
+	with open(COIN, 'w') as f:
+		f.write(COIN)
 
 
 def get_pid():
@@ -106,6 +112,7 @@ def start_coin_mining(coin, algo):
 		Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
 		pid = os.path.basename(miner_bin)
 		write_pid(pid)
+		write_coin(coin)
 		logging("[+] Successfully started %s mining\n" %coin)
 	except:
 		logging("[-] ERROR starting %s miner\nExit\n" %coin)
@@ -189,6 +196,7 @@ def start_nicehash_mining(algo):
 		logging("[+] Successfully started mining on %s algorithm\n" %(algo['name']))
 		pid = os.path.basename(miner_bin)
 		write_pid(pid)
+		write_coin(algo['name'].upper())
 	except:
 		logging("[-] ERROR starting miner %s\nExit" %cmdStr)
 		exit()
