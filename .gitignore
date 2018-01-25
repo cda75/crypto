@@ -1,6 +1,6 @@
 *.log
 *.exe
 *.pyc
-*.log
+PID*
 _*/*
 
