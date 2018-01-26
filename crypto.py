@@ -100,7 +100,13 @@ def start_coin_mining(coin, algo):
 		pass
 	elif algo == 'ethash':
 		# CLAYMOR DUAL miner
-		cmdStr = "%s -epool %s:%s -ewal %s.%s -epsw %s -allcoins 1 -allpools 1 -dpool stratum+tcp://hub.miningpoolhub.com:20550 -dwal %s.%s -dpsw x -dcoin sc" %(miner_bin, pool, port, user, worker, password, user, worker)
+		dpool = cfg.get('ETH', 'DPOOL')
+		dport = cfg.get('ETH', 'DPORT')
+		duser = cfg.get('ETH', 'DUSER')
+		dworker = cfg.get('ETH', 'DWORKER')
+		dpassword = cfg.get('ETH', 'DPASSWORD')
+		dcoin = cfg.get('ETH', 'DCOIN')
+		cmdStr = "%s -epool %s:%s -ewal %s.%s -epsw %s -allcoins 1 -allpools 1 -dpool %s:%s -dwal %s.%s -dpsw %s -dcoin %s" %(miner_bin, pool, port, user, worker, password, dpool, dport, duser, dworker, dpassword, dcoin)
 	else:
 		# CCMINER
 		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, port, user, worker)
