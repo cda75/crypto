@@ -103,11 +103,13 @@ def start_coin_mining(coin, algo):
 		cmdStr = "%s -epool %s:%s -ewal %s.%s -epsw %s -allcoins 1 -allpools 1 -dpool stratum+tcp://hub.miningpoolhub.com:20550 -dwal %s.%s -dpsw x -dcoin sc" %(miner_bin, pool, port, user, worker, password, user, worker)
 	else:
 		# CCMINER
-		if coin == 'XVG':
-			pool = cfg.get('XVG', algo)
-			cmdStr = "%s -a %s -o %s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, user, worker)
-		else:
-			cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, port, user, worker)
+		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, port, user, worker)
+		#XVG
+		#if coin == 'XVG':
+		#	pool = cfg.get('XVG', algo)
+		#	cmdStr = "%s -a %s -o %s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, user, worker)
+		#else:
+		#	cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, port, user, worker)
 	try:
 		Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
 		pid = os.path.basename(miner_bin)
