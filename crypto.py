@@ -89,8 +89,11 @@ def get_best_coin():
 		return 'ZEC', 'equihash'
 
 
-def start_coin_mining(coin, algo):
+def start_coin_mining(coin, algo=None):
 	cfg = SafeConfigParser()
+	if not algo:
+		cfg.read(COINS)
+		algo = cfg.get(coin, 'ALGO')
 	cfg.read(CONFIG)
 	miner_bin = cfg.get('ALGO', algo)
 	cfg.read(COINS)
@@ -168,7 +171,7 @@ def nicehash_best_algo():
 	API_URL = cfg.get('DEFAULT', 'API_URL')
 	payload = {'method': cfg.get('DEFAULT', 'METHOD')}
 	try:
-		logging("[i] Checking best algo...")
+		logging("\n[i] Checking best algo...")
 		req = requests.get(API_URL, params=payload)
 		reqResult = req.json()['result']
 		rez =  reqResult['simplemultialgo']
@@ -210,7 +213,7 @@ def start_nicehash_mining(algo):
 		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo['name'], pool, port, user, worker)
 	try:
 		Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
-		logging("[+] Successfully started mining on %s algorithm\n" %(algo['name']))
+		logging("[+] Successfully started mining on %s algorithm" %(algo['name']))
 		pid = os.path.basename(miner_bin)
 		write_pid(pid)
 		write_coin(algo['name'].upper())
@@ -233,7 +236,7 @@ def nicehash_mining(t1=2, t2=12):
 			logging("[i] New NiceHash best algo is %s" %new_algo['name'])
 			kill_current_miner()
 			sleep(5)
-			logging("[+] Switching to mine on %s algo\n" %new_algo['name'])
+			logging("[+] Switching to mine on %s algo" %new_algo['name'])
 			start_nicehash_mining(new_algo)
 			best_algo = new_algo
 	kill_current_miner()
