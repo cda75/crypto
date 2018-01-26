@@ -138,7 +138,7 @@ def coin_mining(t1=30, t2=12):
 	start_coin_mining(coin)
 	for i in range(int(60/t1*t2)):
 		sleep(t1*60)
-		new_coin, new_algo = get_best_coin()
+		new_coin = get_best_coin()
 		if new_coin == coin:
 			logging("[+] Continue mining %s\n" %coin)
 		else:
@@ -146,7 +146,7 @@ def coin_mining(t1=30, t2=12):
 			kill_current_miner()
 			sleep(5)
 			logging("[+] Switching to mine %s" %new_coin)
-			start_coin_mining(new_coin, new_algo)
+			start_coin_mining(new_coin)
 			coin = new_coin
 	kill_current_miner()
 	logging("[+] Stop coin mining")
