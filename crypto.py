@@ -83,26 +83,24 @@ def get_best_coin():
 			coin_tag = reqResult[coin_name]['tag']
 			coin_algo = reqResult[coin_name]['algorithm']
 			if coin_tag in MY_COINS:
-				return coin_tag, coin_algo.lower()
+				return coin_tag
 	except ValueError:
 		logging("Error getting info from WhatToMine....Mining ZEC")
-		return 'ZEC', 'equihash'
+		return 'ZEC'
 
 
-def start_coin_mining(coin, algo=None):
+def start_coin_mining(coin):
 	cfg = SafeConfigParser()
-	if not algo:
-		cfg.read(COINS)
-		algo = cfg.get(coin, 'ALGO')
-	cfg.read(CONFIG)
-	miner_bin = cfg.get('ALGO', algo)
 	cfg.read(COINS)
+	algo = cfg.get(coin, 'ALGO')
 	user = cfg.get(coin, 'USER')
 	addr = cfg.get(coin, 'ADDR')
 	pool = cfg.get(coin, 'POOL')
 	port = cfg.get(coin, 'PORT')
 	worker = cfg.get(coin, 'WORKER')
 	password = cfg.get(coin, 'PASSWORD')
+	cfg.read(CONFIG)
+	miner_bin = cfg.get('ALGO', algo)
 	if algo == 'equihash':
 		# EWBF Zcash CUDA miner
 		cmdStr = "%s --server %s --port %s --user %s.%s --api 192.168.0.5:42000 --fee 0" %(miner_bin, pool, port, user, worker)
@@ -122,12 +120,6 @@ def start_coin_mining(coin, algo=None):
 	else:
 		# CCMINER
 		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, port, user, worker)
-		#XVG
-		#if coin == 'XVG':
-		#	pool = cfg.get('XVG', algo)
-		#	cmdStr = "%s -a %s -o %s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, user, worker)
-		#else:
-		#	cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, port, user, worker)
 	try:
 		Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
 		pid = os.path.basename(miner_bin)
@@ -141,9 +133,9 @@ def start_coin_mining(coin, algo=None):
 
 def coin_mining(t1=30, t2=12):
 	logging("[i] Started coin mining")
-	coin, algo = get_best_coin()
+	coin = get_best_coin()
 	logging("[i] My current most profitable coin is %s" %coin)
-	start_coin_mining(coin, algo)
+	start_coin_mining(coin)
 	for i in range(int(60/t1*t2)):
 		sleep(t1*60)
 		new_coin, new_algo = get_best_coin()
