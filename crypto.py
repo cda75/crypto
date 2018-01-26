@@ -202,7 +202,7 @@ def start_nicehash_mining(algo):
 		exit()
 
 
-def nicehash_mining(t1=1,t2=8):
+def nicehash_mining(t1=2, t2=12):
 	logging("[i] Started NiceHash mining")
 	best_algo = nicehash_best_algo()
 	logging("[i] Current NiceHash best algo: %s" %(best_algo['name']))
@@ -226,7 +226,8 @@ def nicehash_mining(t1=1,t2=8):
 
 if __name__ == "__main__":
 	while True:
-		coin_mining(t1=60)
+		coin_mining()
+		nicehash_mining()
 
 
 
