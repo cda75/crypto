@@ -163,7 +163,7 @@ def nicehash_best_algo():
 	API_URL = cfg.get('DEFAULT', 'API_URL')
 	payload = {'method': cfg.get('DEFAULT', 'METHOD')}
 	try:
-		logging("\n[i] Checking best algo...")
+		logging("[i] Checking best algo...")
 		req = requests.get(API_URL, params=payload)
 		reqResult = req.json()['result']
 		rez =  reqResult['simplemultialgo']
@@ -236,10 +236,47 @@ def nicehash_mining(t1=2, t2=12):
 	logging("----------------------------------------------------------------------\n")
 
 
+def mine_eth(coin='ETH'):
+	cfg = SafeConfigParser()
+	cfg.read(COINS)
+	#read ETH data
+	eth_user   = cfg.get(coin, 'USER')
+	eth_addr   = cfg.get(coin, 'ADDR')
+	eth_pool   = cfg.get(coin, 'POOL')
+	eth_port    = cfg.get(coin, 'PORT')
+	eth_worker = cfg.get(coin, 'WORKER')
+	#read dual coin data
+	dpool 	   = cfg.get('ETH', 'DPOOL')
+	dport 	   = cfg.get('ETH', 'DPORT')
+	duser 	   = cfg.get('ETH', 'DUSER')
+	dworker    = cfg.get('ETH', 'DWORKER')
+	#dpassword  = cfg.get('ETH', 'DPASSWORD')
+	#read zec data
+	zec_user   = cfg.get('ZEC', 'USER')
+	zec_addr   = cfg.get('ZEC', 'ADDR')
+	zec_pool   = cfg.get('ZEC', 'POOL')
+	zec_port    = cfg.get('ZEC', 'PORT')
+	zec_worker = cfg.get('ZEC', 'WORKER')
+	cfg.read(CONFIG)
+	eth_bin = cfg.get('ALGO', 'ethash')
+	eth_pid = os.path.basename(eth_bin)
+	eth_cmd = "%s -di 023 -epool %s:%s -ewal %s.%s -allcoins 1 -allpools 1 -dpool %s:%s -dwal %s.%s -dcoin sc" %(eth_bin, eth_pool, eth_port, eth_user, eth_worker, dpool, dport, duser, dworker)
+	zec_bin = cfg.get('ALGO', 'equihash')
+	zec_pid = os.path.basename(zec_bin)
+	zec_cmd = "%s --server %s --port %s --user %s.%s --cuda_devices 1 --api 192.168.0.5:42000 --fee 0" %(zec_bin, zec_pool, zec_port, zec_user, zec_worker)
+	try:
+		Popen(zec_cmd, creationflags=CREATE_NEW_CONSOLE)
+		set_env()
+		Popen(eth_cmd, creationflags=CREATE_NEW_CONSOLE)
+	except:
+		logging("[-] ERROR starting %s miner\nExit\n" %coin)
+		exit()
+
+
 if __name__ == "__main__":
 	while True:
-		coin_mining()
-		nicehash_mining()
+		coin_mining(t2=24)
+		nicehash_mining(t2=24)
 
 
 
