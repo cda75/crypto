@@ -267,9 +267,9 @@ def mine_eth(coin='ETH'):
 	eth_bin = cfg.get('ALGO', 'ethash')
 	eth_pid = os.path.basename(eth_bin)
 	eth_cmd = "%s -di 023 -epool %s:%s -ewal %s.%s -allcoins 1 -allpools 1 -dpool %s:%s -dwal %s.%s -dcoin sc" %(eth_bin, eth_pool, eth_port, eth_user, eth_worker, dpool, dport, duser, dworker)
-	zec_bin = cfg.get('ALGO', 'equihash')
+	zec_bin = cfg.get('ALGO', 'eq_test')
 	zec_pid = os.path.basename(zec_bin)
-	zec_cmd = "%s --server %s --port %s --user %s.%s --cuda_devices 1 --api 192.168.0.5:42000 --fee 0" %(zec_bin, zec_pool, zec_port, zec_user, zec_worker)
+	zec_cmd = "%s --server %s --port %s --user %s --dev 1 --telemetry =0.0.0.0:42001" %(zec_bin, zec_pool, zec_port, zec_user)
 	try:
 		Popen(zec_cmd, creationflags=CREATE_NEW_CONSOLE)
 		set_env()
@@ -281,6 +281,8 @@ def mine_eth(coin='ETH'):
 
 if __name__ == "__main__":
 	while True:
+		mine_eth()
+		sleep(3600)
 		coin_mining()
 		nicehash_mining()
 
