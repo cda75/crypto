@@ -176,50 +176,54 @@ def nicehash_best_algo():
 	try:
 		logging("[i] Checking best algo...")
 		req = requests.get(API_URL, params=payload)
-		reqResult = req.json()['result']
-		rez =  reqResult['simplemultialgo']
+		rez = req.json()['result']['simplemultialgo']
 		for i in rez:
-			algo_name = i['name'].strip()
+			algo_name = i['name']
 			if algo_name in my_algo:
 				algo_price = float(i["paying"])
 				algo_speed = long(algo_dict[algo_name])
 				algo_value = algo_price*algo_speed
 				if algo_value > best_value:
 					best_value = algo_value
-					best_algo = i
+					best_algo = algo_name
 		return best_algo
 	except ValueError:
-		logging('[-] Oooops. Error getting data from NiceHash\nMining on Equihash algo')
+		logging('[-] Oooops. Error getting data from NiceHash\nMining on default algo')
 		return 'equihash'
 
 
-def start_nicehash_mining(algo):
+def start_nicehash_mining(algo, gpu='all'):
 	cfg = SafeConfigParser()
 	cfg.read(CONFIG)
-	miner_bin = cfg.get('ALGO', algo['name'])
+	miner_bin = cfg.get('ALGO', algo)
 	cfg.read(NICEHASH)
-	pool = cfg.get('DEFAULT', algo['name'])
+	pool, port = (cfg.get('DEFAULT', algo)).split()
 	user = cfg.get('DEFAULT', 'ADDR')
 	worker = cfg.get('DEFAULT', 'WORKER')
-	port = algo['port']
-	if algo['name'] == 'equihash':
+	if algo == 'equihash':
+		if gpu == 'all':
+			gpu = '0 1 2 3'
 		# EWBF Zcash CUDA miner
-		cmdStr = "%s --server %s --port %s --user %s.%s --api 192.168.0.5:42000 --fee 0" %(miner_bin, pool, port, user, worker)
-	elif algo['name'] == 'cryptonight':
+		#cmdStr = "%s --server %s --port %s --user %s.%s --api 192.168.0.5:42000 --fee 0" %(miner_bin, pool, port, user, worker)
+		#DTSM Zcash Cuda miner
+		cmdStr = "%s --dev %s --server %s --port %s --user %s.%s --telemetry=0.0.0.0:42000" %(miner_bin, gpu, pool, port, user, worker)
+	elif algo == 'cryptonight':
 		# XMR-STAK
 		pass
-	elif algo['name'] == 'ethash':
+	elif algo == 'daggerhashimoto':
 		# CLAYMOR DUAL miner
-		cmdStr = "%s -epool %s:%s -ewal %s.%s -epsw %s" %(miner_bin, pool, port, user, worker, password)
+		if gpu == 'all':
+			gpu = '0123'
+		cmdStr = "%s -di %s -epool %s:%s -ewal %s.%s -di %s" %(miner_bin, gpu, pool, port, user, worker, gpu)
 	else:
 		# CCMINER
-		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo['name'], pool, port, user, worker)
+		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, port, user, worker)
 	try:
 		Popen(cmdStr, creationflags=CREATE_NEW_CONSOLE)
-		logging("[+] Successfully started mining on %s algorithm" %(algo['name']))
+		logging("[+] Successfully started mining on %s algorithm" %(algo))
 		pid = os.path.basename(miner_bin)
 		write_pid(pid)
-		write_coin(algo['name'].upper())
+		write_coin(algo.upper())
 	except:
 		logging("[-] ERROR starting miner %s\nExit" %cmdStr)
 		exit()
@@ -228,7 +232,7 @@ def start_nicehash_mining(algo):
 def nicehash_mining(t1=2, t2=12):
 	logging("[i] Started NiceHash mining")
 	best_algo = nicehash_best_algo()
-	logging("[i] Current NiceHash best algo: %s" %(best_algo['name']))
+	logging("[i] Current NiceHash best algo: %s" %best_algo)
 	start_nicehash_mining(best_algo)
 	if t1 == 0:
 		exit()
@@ -236,13 +240,13 @@ def nicehash_mining(t1=2, t2=12):
 	for i in range(cycles):
 		sleep(t1*60)
 		new_algo = nicehash_best_algo()
-		if new_algo['name'] == best_algo['name']:
-			logging("[i] Continue on current algo %s" %best_algo['name'])
+		if new_algo == best_algo:
+			logging("[i] Continue on current algo %s" %best_algo)
 		else:
-			logging("[i] New NiceHash best algo is %s" %new_algo['name'])
+			logging("[i] New NiceHash best algo is %s" %new_algo)
 			kill_current_miner()
 			sleep(5)
-			logging("[+] Switching to mine on %s algo" %new_algo['name'])
+			logging("[+] Switching to mine on %s algo" %new_algo)
 			start_nicehash_mining(new_algo)
 			best_algo = new_algo
 	kill_current_miner()
@@ -293,8 +297,6 @@ def mine_eth(coin='ETH'):
 
 if __name__ == "__main__":
 	while True:
-		#mine_eth(coin='ETC')
-		#sleep(3600)
 		coin_mining()
 		nicehash_mining()
 
