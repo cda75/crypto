@@ -81,16 +81,13 @@ def get_best_coin(coins='all'):
 		reqResult = req.json()['coins']
 		best_dict = {}
 		for coin, value in reqResult.iteritems():
-			best_dict[coin] = value['profitability']
+			coin_tag = value['tag']
+			if  coin_tag in MY_COINS:
+				best_dict[coin_tag] = value['profitability']
 		rez = sorted(best_dict.items(), key=operator.itemgetter(1), reverse=True)
-		for i in rez:
-			coin_name = i[0]
-			coin_tag = reqResult[coin_name]['tag']
-			coin_algo = reqResult[coin_name]['algorithm']
-			if coin_tag in MY_COINS:
-				return coin_tag
-	except ValueError:
-		logging("Error getting info from WhatToMine....Mining ZEC")
+		return rez[0][0]
+	except:
+		logging("Error getting data from WhatToMine....Mining default coin")
 		return 'ZEC'
 
 
@@ -116,17 +113,33 @@ def start_coin_mining(coin):
 		pass
 	elif algo == 'ethash':
 		# CLAYMOR DUAL miner
-		'''
-		dpool = cfg.get('ETH', 'DPOOL')
-		dport = cfg.get('ETH', 'DPORT')
-		duser = cfg.get('ETH', 'DUSER')
-		dworker = cfg.get('ETH', 'DWORKER')
-		dpassword = cfg.get('ETH', 'DPASSWORD')
-		dcoin = cfg.get('ETH', 'DCOIN')
-		set_env()
-		cmdStr = "%s -di 023 -epool %s:%s -ewal %s.%s -epsw %s -allcoins 1 -allpools 1 -dpool %s:%s -dwal %s.%s -dpsw %s -dcoin %s" %(miner_bin, pool, port, user, worker, password, dpool, dport, duser, dworker, dpassword, dcoin)
-		'''
-		mine_eth(coin=coin)
+		zec_bin = cfg.get('ALGO', 'equihash')
+		zec_pid = os.path.basename(zec_bin)
+		#read dual coin data
+		cfg.read(COINS)
+		dpool 	   = cfg.get('ETH', 'DPOOL')
+		dport 	   = cfg.get('ETH', 'DPORT')
+		duser 	   = cfg.get('ETH', 'DUSER')
+		dworker    = cfg.get('ETH', 'DWORKER')
+		#dpassword  = cfg.get('ETH', 'DPASSWORD')
+		#read zec data
+		zec_user   = cfg.get('ZEC', 'USER')
+		zec_addr   = cfg.get('ZEC', 'ADDR')
+		zec_pool   = cfg.get('ZEC', 'POOL')
+		zec_port    = cfg.get('ZEC', 'PORT')
+		zec_worker = cfg.get('ZEC', 'WORKER')
+		pid = os.path.basename(miner_bin)
+		eth_cmd = "%s -di 023 -epool %s:%s -ewal %s.%s -allcoins 1 -allpools 1 -dpool %s:%s -dwal %s.%s -dcoin sc" %(miner_bin, pool, port, user, worker, dpool, dport, duser, dworker)
+		zec_cmd = "%s --server %s --port %s --user %s --dev 1 --telemetry =0.0.0.0:42001" %(zec_bin, zec_pool, zec_port, zec_user)
+		try:
+			Popen(zec_cmd, creationflags=CREATE_NEW_CONSOLE)
+			#set_env()
+			Popen(eth_cmd, creationflags=CREATE_NEW_CONSOLE)
+			write_pid(pid, zec_pid)
+			write_coin(coin+"\nZEC")
+			logging("[+] Successfully started %s:ZEC mining\n" %coin)
+		except:
+			logging("[-] ERROR starting %s miner\nExit\n" %coin)
 		return 1
 	else:
 		# CCMINER
@@ -253,7 +266,7 @@ def nicehash_mining(t1=2, t2=12):
 	logging("[+] Stop nicehash mining")
 	logging("----------------------------------------------------------------------\n")
 
-
+'''
 def mine_eth(coin='ETH'):
 	cfg = SafeConfigParser()
 	cfg.read(COINS)
@@ -291,15 +304,11 @@ def mine_eth(coin='ETH'):
 		logging("[+] Successfully started %s mining\n" %coin)
 	except:
 		logging("[-] ERROR starting %s miner\nExit\n" %coin)
-		print "This!"
 		exit()
-
+'''
 
 if __name__ == "__main__":
+
 	while True:
 		coin_mining()
 		nicehash_mining()
-
-
-
-
