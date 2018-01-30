@@ -29,14 +29,16 @@ def logging(info):
 
 
 def kill_current_miner():
-	pid = get_pid()
-	cmdStr = "taskkill /f /im %s" %(pid)
-	os.system(cmdStr)
+	pids = get_pid()
+	for pid in pids:
+		cmdStr = "taskkill /f /im %s" %(pid)
+		os.system(cmdStr)
 
 
-def write_pid(pid):
+def write_pid(*pids):
 	with open(PID, 'w') as f:
-		f.write(pid)
+		for pid in pids:
+			f.write(pid+'\n')
 
 
 def write_coin(coin):
@@ -46,8 +48,8 @@ def write_coin(coin):
 
 def get_pid():
 	with open(PID) as f:
-		pid = f.read()
-	return pid
+		pids = f.readlines()
+	return [pid.strip() for pid in pids]
 
 
 def check_pid(pid):
@@ -65,9 +67,9 @@ def set_env():
 	os.system('setx GPU_SINGLE_ALLOC_PERCENT 100')
 
 
-def get_best_coin(coins=None):
+def get_best_coin(coins='all'):
 	JSON_URL = r"https://whattomine.com/coins.json?utf8=✓&adapt_q_280x=0&adapt_q_380=0&adapt_q_fury=0&adapt_q_470=0&adapt_q_480=0&adapt_q_570=0&adapt_q_580=3&adapt_q_vega56=0&adapt_q_vega64=0&adapt_q_750Ti=0&adapt_q_1050Ti=0&adapt_q_10606=1&adapt_10606=true&adapt_q_1070=2&adapt_1070=true&adapt_q_1070Ti=1&adapt_1070Ti=true&adapt_q_1080=03&adapt_q_1080Ti=0&eth=true&factor%5Beth_hr%5D=113.0&factor%5Beth_p%5D=465.0&grof=true&factor%5Bgro_hr%5D=124.0&factor%5Bgro_p%5D=470.0&x11gf=true&factor%5Bx11g_hr%5D=43.4&factor%5Bx11g_p%5D=450.0&cn=true&factor%5Bcn_hr%5D=2320.0&factor%5Bcn_p%5D=360.0&eq=true&factor%5Beq_hr%5D=1600.0&factor%5Beq_p%5D=450.0&lre=true&factor%5Blrev2_hr%5D=132300.0&factor%5Blrev2_p%5D=470.0&ns=true&factor%5Bns_hr%5D=3550.0&factor%5Bns_p%5D=470.0&lbry=true&factor%5Blbry_hr%5D=1020.0&factor%5Blbry_p%5D=450.0&factor%5Bbk2b_hr%5D=5990.0&factor%5Bbk2b_p%5D=440.0&factor%5Bbk14_hr%5D=9100.0&factor%5Bbk14_p%5D=460.0&pas=true&factor%5Bpas_hr%5D=3580.0&factor%5Bpas_p%5D=450.0&skh=true&factor%5Bskh_hr%5D=104.5&factor%5Bskh_p%5D=450.0&factor%5Bl2z_hr%5D=420.0&factor%5Bl2z_p%5D=300.0&factor%5Bcost%5D=0.1&sort=Profit&volume=0&revenue=current&factor%5Bexchanges%5D%5B%5D=&factor%5Bexchanges%5D%5B%5D=abucoins&factor%5Bexchanges%5D%5B%5D=bitfinex&factor%5Bexchanges%5D%5B%5D=bittrex&factor%5Bexchanges%5D%5B%5D=bleutrade&factor%5Bexchanges%5D%5B%5D=cryptopia&factor%5Bexchanges%5D%5B%5D=hitbtc&factor%5Bexchanges%5D%5B%5D=poloniex&factor%5Bexchanges%5D%5B%5D=yobit&dataset=Main&commit=Calculate"	
-	if coins:
+	if coins != 'all':
 		MY_COINS = [x.strip() for x in coins.split(',')]
 	else:
 		cfg = SafeConfigParser()
@@ -106,12 +108,15 @@ def start_coin_mining(coin):
 	miner_bin = cfg.get('ALGO', algo)
 	if algo == 'equihash':
 		# EWBF Zcash CUDA miner
-		cmdStr = "%s --server %s --port %s --user %s.%s --api 192.168.0.5:42000 --fee 0" %(miner_bin, pool, port, user, worker)
+		#cmdStr = "%s --server %s --port %s --user %s.%s --api 192.168.0.5:42000 --fee 0" %(miner_bin, pool, port, user, worker)
+		#DTSM Zcash Cuda miner
+		cmdStr = "%s --server %s --port %s --user %s.%s --telemetry=0.0.0.0:42000" %(miner_bin, pool, port, user, worker)
 	elif algo == 'cryptonight':
 		# XMR-STAK
 		pass
 	elif algo == 'ethash':
 		# CLAYMOR DUAL miner
+		'''
 		dpool = cfg.get('ETH', 'DPOOL')
 		dport = cfg.get('ETH', 'DPORT')
 		duser = cfg.get('ETH', 'DUSER')
@@ -120,6 +125,9 @@ def start_coin_mining(coin):
 		dcoin = cfg.get('ETH', 'DCOIN')
 		set_env()
 		cmdStr = "%s -di 023 -epool %s:%s -ewal %s.%s -epsw %s -allcoins 1 -allpools 1 -dpool %s:%s -dwal %s.%s -dpsw %s -dcoin %s" %(miner_bin, pool, port, user, worker, password, dpool, dport, duser, dworker, dpassword, dcoin)
+		'''
+		mine_eth(coin=coin)
+		return 1
 	else:
 		# CCMINER
 		cmdStr = "%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(miner_bin, algo, pool, port, user, worker)
@@ -267,22 +275,26 @@ def mine_eth(coin='ETH'):
 	eth_bin = cfg.get('ALGO', 'ethash')
 	eth_pid = os.path.basename(eth_bin)
 	eth_cmd = "%s -di 023 -epool %s:%s -ewal %s.%s -allcoins 1 -allpools 1 -dpool %s:%s -dwal %s.%s -dcoin sc" %(eth_bin, eth_pool, eth_port, eth_user, eth_worker, dpool, dport, duser, dworker)
-	zec_bin = cfg.get('ALGO', 'eq_test')
+	zec_bin = cfg.get('ALGO', 'equihash')
 	zec_pid = os.path.basename(zec_bin)
 	zec_cmd = "%s --server %s --port %s --user %s --dev 1 --telemetry =0.0.0.0:42001" %(zec_bin, zec_pool, zec_port, zec_user)
 	try:
 		Popen(zec_cmd, creationflags=CREATE_NEW_CONSOLE)
 		set_env()
 		Popen(eth_cmd, creationflags=CREATE_NEW_CONSOLE)
+		write_pid(zec_pid, eth_pid)
+		write_coin(coin)
+		logging("[+] Successfully started %s mining\n" %coin)
 	except:
 		logging("[-] ERROR starting %s miner\nExit\n" %coin)
+		print "This!"
 		exit()
 
 
 if __name__ == "__main__":
 	while True:
-		mine_eth()
-		sleep(3600)
+		#mine_eth(coin='ETC')
+		#sleep(3600)
 		coin_mining()
 		nicehash_mining()
 

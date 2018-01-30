@@ -1,5 +1,5 @@
 [ALGO]
-equihash = C:\Users\root\CryptoPro\ewbf\miner.exe
+equihash_old = C:\Users\root\CryptoPro\ewbf\miner.exe
 ethash = C:\Users\root\CryptoPro\claymor\EthDcrMiner64.exe
 cryptonight = C:\Users\root\CryptoPro\xmr-stak\xmr-stak.exe
 lyra2rev2 = C:\Users\root\CryptoPro\ccminer\ccminer-x64.exe
@@ -13,7 +13,7 @@ lbry = %(lyra2rev2)s
 x17 = %(lyra2rev2)s
 myriad-groestl = %(lyra2rev2)s
 lyra2z = %(lyra2rev2)s
-eq_test = C:\Users\root\CryptoPro\dtsm\zm.exe
+equihash = C:\Users\root\CryptoPro\dtsm\zm.exe
 
 [OVERCLOCK]
 PATH = C:\Program Files (x86)\MSI Afterburner\MSIAfterburner.exe
