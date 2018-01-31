@@ -167,6 +167,8 @@ def coin_mining(t1=30, t2=12, coins='all'):
 	coin = get_best_coin(coins)
 	logging("[i] My current most profitable coin is %s" %coin)
 	start_coin_mining(coin)
+	if t1 == 0:
+		t1 = t2*60
 	for i in range(int(60/t1*t2)):
 		sleep(t1*60)
 		new_coin = get_best_coin(coins)
@@ -255,7 +257,7 @@ def nicehash_mining(t1=2, t2=12):
 	logging("[i] Current NiceHash best algo: %s" %best_algo)
 	start_nicehash_mining(best_algo)
 	if t1 == 0:
-		exit()
+		t1 = t2*60
 	cycles = int(60/t1*t2)
 	for i in range(cycles):
 		sleep(t1*60)
@@ -276,4 +278,6 @@ def nicehash_mining(t1=2, t2=12):
 
 
 if __name__ == "__main__":
-	print get_best_coin()
+	while True:
+		coin_mining(t2=4)
+		nicehash_mining(t2=4)
