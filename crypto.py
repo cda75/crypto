@@ -268,7 +268,6 @@ def nicehash_mining(t1=2, t2=12):
 
 
 if __name__ == "__main__":
-
 	while True:
-		coin_mining()
-		nicehash_mining()
+		coin_mining(t2=4,coins='ETH, ETC, XVG, ZEC, KMD, ZCL')
+		nicehash_mining(t2=2)
