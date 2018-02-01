@@ -136,7 +136,7 @@ def start_coin_mining(coin):
 		zec_port    = cfg.get('ZEC', 'PORT')
 		zec_worker = cfg.get('ZEC', 'WORKER')
 		pid = os.path.basename(miner_bin)
-		eth_cmd = "%s -di 023 -epool %s:%s -ewal %s.%s -allcoins 1 -allpools 1 -dpool %s:%s -dwal %s.%s -dcoin sc" %(miner_bin, pool, port, user, worker, dpool, dport, duser, dworker)
+		eth_cmd = "%s -di 023 -epool %s:%s -ewal %s.%s " %(miner_bin, pool, port, user, worker)
 		zec_cmd = "%s --server %s --port %s --user %s --dev 1 --telemetry =0.0.0.0:42001" %(zec_bin, zec_pool, zec_port, zec_user)
 		try:
 			Popen(zec_cmd, creationflags=CREATE_NEW_CONSOLE)
@@ -169,6 +169,7 @@ def coin_mining(t1=30, t2=12, coins='all'):
 	start_coin_mining(coin)
 	if t1 == 0:
 		sleep(t2*3600)
+		kill_current_miner()
 		return 1
 	cycles = int(60/t1*t2)
 	for i in range(cycles):
@@ -260,7 +261,8 @@ def nicehash_mining(t1=2, t2=12):
 	start_nicehash_mining(best_algo)
 	if t1 == 0:
 		sleep(t2*3600)
-			return 1
+		kill_current_miner()
+		return 1
 	cycles = int(60/t1*t2)
 	for i in range(cycles):
 		sleep(t1*60)
@@ -282,5 +284,5 @@ def nicehash_mining(t1=2, t2=12):
 
 if __name__ == "__main__":
 	while True:
-		coin_mining(t1=0, t2=0.3, coins='XVG')
-		coin_mining(t1=20, t2=8, coins='ETH, ETC, XVG, KMD, HASH, ZCL, ZEC')
+		#coin_mining(t1=0, t2=0.5, coins='XVG')
+		coin_mining(t2=8, coins='ETH, ETC, XVG, KMD, HASH, ZCL, ZEC')
