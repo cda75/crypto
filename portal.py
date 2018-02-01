@@ -6,37 +6,68 @@ import os
 from ConfigParser import SafeConfigParser 
 import json
 import pandas as pd
-from flask import Flask
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
+from flask import Flask, render_template
 from datetime import datetime
 import csv
 from operator import itemgetter
+import tablib
+import threading
 
 
-
-API_URL = "https://min-api.cryptocompare.com/data/pricemulti"
 WORK_DIR = os.path.dirname(os.path.realpath(__file__))
 COINS = os.path.join(WORK_DIR, 'coins.conf')
 API = os.path.join(WORK_DIR, 'api.conf')
-PRICE = os.path.join(WORK_DIR, 'price.csv')
+PRICES = os.path.join(WORK_DIR, 'price.csv')
 
-#API DOC at "https://github.com/MPOS/php-mpos/wiki/API-Reference"
-#MPH_API = "https://[<coin_name>.]miningpoolhub.com/index.php?page=api&action=<method>&api_key=<user_api_key>[&<argument>=<value>]"
+app = Flask(__name__)
+
+ALGO = {'ETH': 'Ethash',
+		'ETC': 'Ethash',
+		'ZEC': 'Equihash',
+		'ZCL': 'Equihash',
+		'KMD': 'Equihash',
+		'BTG': 'Equihash',
+		'ZEN': 'Equihash',
+		'HUSH': 'Equihash',
+		'XVG': 'X17',
+		'XMR': 'Cryptonight'
+}
 
 
-MY_COINS = 'BTC,ETH,ETC,ZEC,ZCL,XMR,XVG,KMD,HUSH'
+@app.route('/')
+def main():
+	dataset = tablib.Dataset()
+	with open(PRICES) as f:
+		dataset.csv = f.read()
+	data = dataset.html
+	return render_template('index.html', data=data)
 
 
-def get_price(coin=MY_COINS, cur='USD,RUB,BTC'):
-	payload = {'fsyms': coin, 'tsyms': cur}
-	req = requests.get(API_URL, params=payload)
-	r = req.json()
-	rez = []
-	for k,v in r.iteritems():
-		rez.append([k,v['USD'],v['RUB'],v['BTC']])
-	return sorted(rez, key=itemgetter(0))
+@app.route('/mrk1.html')
+def market():
+	dataset = tablib.Dataset()
+	with open(PRICES) as f:
+		dataset.csv = f.read()
+	data = dataset.html
+	return render_template('mrk1.html', data=data)
+
+
+@app.route('/balance.html')
+def balance():
+
+	return render_template('balance.html')
+
+
+@app.route('/dt.html')
+def date_time():
+	date = dt.strftime(dt.now(), "%d/%m/%Y")
+	time = dt.strftime(dt.now(), "%H:%M:%S")
+	return render_template('dt.html', date=date, time=time, uptime='uptime')
+
+
+def get_current_coin():
+	with open(COIN, 'r') as f:
+		return f.read()
 
 
 def get_balance(coin):
@@ -70,50 +101,40 @@ def get_balance(coin):
 	return value
 
 
-
-def write_prices_csv():
-	prices = get_price()
-	header = ['COIN','USD','RUB','BTC']
-	with open(PRICE, 'wb') as f:
-		writer = csv.writer(f)
-		writer.writerow(header)
-		for row in prices:
-			writer.writerow(row)
-
-
-def make_dash_table(df):
-	table = []
-	for index, row in df.iterrows():
-		html_row = []
-		for i in range(len(row)):
-			html_row.append(html.Td([row[i]]))
-		table.append(html.Tr(html_row))
-	return table
-
-
-df_prices = pd.read_csv(PRICE)
+class MarketData(object):
+	def __init__(self, interval=60):
+		self.interval = interval
+		self.API = "https://min-api.cryptocompare.com/data/pricemulti"
+		self.MY_COINS = 'BTC,ETH,ETC,ZEC,ZCL,XMR,XVG,KMD,HUSH'
+		self.MY_CUR = 'USD,RUB,BTC'
+		thread = threading.Thread(target=self.run, args=())
+		thread.daemon = True                         
+		thread.start()
+	def run(self):
+		while True:
+			payload = {'fsyms': self.MY_COINS, 'tsyms': self.MY_CUR}
+			req = requests.get(self.API, params=payload)
+			r = req.json()
+			rez = []
+			for k,v in r.iteritems():
+				rez.append([k,v['USD'],v['RUB'],v['BTC']])
+			prices = sorted(rez, key=itemgetter(0))
+			header = ['COIN','USD','RUB','BTC']
+			with open(PRICES, 'wb') as f:
+				writer = csv.writer(f)
+				writer.writerow(header)
+				for row in prices:
+					writer.writerow(row)
+			sleep(self.interval)
 
 
 def main():
-	colors = {'background': '#111111', 'text1': '#7FDBFF', 'text2': '#FFFFFF'}
-	app = dash.Dash()
-	#app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"})
-	app.layout = 	html.Div(	style={'backgroundColor': colors['background']},
-							children=[
-								html.H1('Mining Portal', style={'textAlign': 'center', 'color': colors['text1']}),
-								html.Div('Monitoring workers, coins, and more...', style={'textAlign': 'center', 'color': colors['text1']}),
-								html.Br([]),
-								html.Div([html.H2('Market Prices', className="gs-header gs-text-header padded", style={'color': colors['text2']} ),
-										html.Table(make_dash_table(df_prices), className='blue-text', style={'color': colors['text2']})
-										], className="four columns")
-								]
-							)
-	
+	pass
 
-	app.run_server(debug=True)
 
 if __name__ == "__main__":
-	main()
+	MarketData()
+	app.run(debug = True)
 
 
 
