@@ -95,7 +95,7 @@ def get_best_coin(coins='all', algo='all'):
 		rez = sorted(best_dict.items(), key=operator.itemgetter(1), reverse=True)
 		return rez[0][0]
 	except:
-		logging("Error getting data from WhatToMine....Mining default coin")
+		logging("[-] ror getting data from WhatToMine....Mining default coin")
 		return 'ZEC'
 
 
@@ -168,8 +168,10 @@ def coin_mining(t1=30, t2=12, coins='all'):
 	logging("[i] My current most profitable coin is %s" %coin)
 	start_coin_mining(coin)
 	if t1 == 0:
-		t1 = t2*60
-	for i in range(int(60/t1*t2)):
+		sleep(t2*3600)
+		return 1
+	cycles = int(60/t1*t2)
+	for i in range(cycles):
 		sleep(t1*60)
 		new_coin = get_best_coin(coins)
 		if new_coin == coin:
@@ -257,7 +259,8 @@ def nicehash_mining(t1=2, t2=12):
 	logging("[i] Current NiceHash best algo: %s" %best_algo)
 	start_nicehash_mining(best_algo)
 	if t1 == 0:
-		t1 = t2*60
+		sleep(t2*3600)
+			return 1
 	cycles = int(60/t1*t2)
 	for i in range(cycles):
 		sleep(t1*60)
@@ -279,5 +282,5 @@ def nicehash_mining(t1=2, t2=12):
 
 if __name__ == "__main__":
 	while True:
-		coin_mining(t2=4)
-		nicehash_mining(t2=4)
+		coin_mining(t1=0, t2=0.3, coins='XVG')
+		coin_mining(t1=20, t2=8, coins='ETH, ETC, XVG, KMD, HASH, ZCL, ZEC')
