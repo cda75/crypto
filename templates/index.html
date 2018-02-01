@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+  		<meta charset="utf-8">
+  		<title>Crypto market prices</title>
+  		<style>
+  			body {
+  				background-color: #003300;
+  				position:fixed;
+    			top:0;
+    			bottom:0;
+    			left:0;
+    			right:0;
+  			}
+  			.header {
+  				height: 7%;
+  				padding: 0px;
+  				border: 0px;
+  				margin: 0px;
+  				color: red;
+  				background: #004d26;
+  			}
+  			.stats {
+  				width: 80%;
+  				height: 90%;
+  				float: left;
+  				padding: 0px;
+  				border: 0px;
+  				margin: 0px;
+  				color: red;
+  			}
+  			.balance {
+  				width: 19%;
+  				height: 45%;
+  				float: right;
+  				padding: 0px;
+  				border: 0px;
+  				margin: 0px;
+  				color: red;
+  				background: black;
+  			}
+  			.table {
+  				width: 19%;
+  				height: 45%;
+  				float: right;
+  				padding: 0px;
+  				border: 0px;
+  				margin: 0px;
+  				color: green;
+  				background: black;
+  			}
+  		</style>
+ 	</head>
+ 	<body>
+ 		<div class="header"> HEADER</div>
+ 		<div class="stats"> STATS</div>
+ 		<div class="balance"> BALANCE</div>
+ 		<div class="table" >
+      {% block body %}
+      {{ data|safe }}
+      {% endblock %}       
+    </div>
+ 	</body>
+</html>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Show CSV</title>
+</head>
+<body>
+  <div class="table">
+    {% block body %}
+    {{ data|safe }}
+    {% endblock %}  
+  </div>
+</body>
+</html>
