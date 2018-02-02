@@ -19,6 +19,8 @@ COINS = os.path.join(WORK_DIR, 'coins.conf')
 API = os.path.join(WORK_DIR, 'api.conf')
 PRICES = os.path.join(WORK_DIR, 'price.csv')
 BALANCE = os.path.join(WORK_DIR, 'balance.csv')
+PID = os.path.join(WORK_DIR, 'PID')
+COIN = os.path.join(WORK_DIR, 'COIN')
 
 app = Flask(__name__)
 
@@ -42,7 +44,14 @@ def index():
 
 @app.route('/main.html')
 def main():
-	return render_template('main.html')
+	coin = get_current_coin()
+	algo = ALGO[coin]
+	pid = get_current_pid
+	if (coin in ['ETC', 'ETH'] and pid == "EthDcrMiner64.exe") or (algo in ['x17','neoscrypt','lyra2rev2'] and pid == "ccminer-x64.exe"):
+		status = 'ACTIVE'
+	else:
+		status = 'INACTIVE'
+	return render_template('main.html', coin, algo, pid, status)
 
 
 @app.route('/market.html')
@@ -80,6 +89,11 @@ def log():
 
 def get_current_coin():
 	with open(COIN, 'r') as f:
+		return f.read()
+
+
+def get_current_pid():
+	with open(PID, 'r') as f:
 		return f.read()
 
 
