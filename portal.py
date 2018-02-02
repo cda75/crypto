@@ -145,7 +145,7 @@ class MarketData(object):
 
 if __name__ == "__main__":
 	#MarketData()
-	app.run(debug = True)
+	app.run(host="0.0.0.0", debug = True)
 
 
 
