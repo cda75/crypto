@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <style type="text/css">
+   table {
+    /* background: #29a329;  Цвет фона таблицы */
+    color: #18DFB1; /* Цвет текста */
+    width: 100%;
+    height: 100%;
+    padding-left: 5px;
+    text-align: left;
+   }
+   th {
+    color: #6EDE23;
+   }
+   td {
+    vertical-align: middle;
+    align-content: center;
+    vertical-align: middle;
+   }
+  </style>
+ </head>
+ <body>
+   <table cellpadding="2" cellspacing="1" border="1"> 
+   <tr>
+    <th>COIN</th>
+    <th>USD</th>
+    <th>RUB</th>
+    <th>BTC</th>
+   </tr>
+   <tr>
+      <td> <img src="/static/img/btc.png" valign="middle" align="center" width="24" height="24" border="0">BTC</td>
+      <td> {{ btc }} </td>
+      <td> {{ btc_usd }} $ </td>
+      <td> {{ btc_rub }} rub </td>
+   </tr>
+   <tr>
+      <td><img src="/static/img/eth.png" valign="middle" align="center" width="24" height="24" border="0">ETH</td>
+      <td>{{eth}}</td>
+      <td>{{eth_usd}} $</td>
+      <td>{{eth_rub}} rub</td>
+  </tr>
+   <tr>
+      <td><img src="/static/img/etc.png" valign="middle" align="center" width="24" height="24" border="0">ETC</td>
+      <td>{{etc}}</td>
+      <td>{{etc_usd}} $</td>
+      <td>{{etc_rub}} rub</td>
+  </tr>
+   <tr>
+      <td><img src="/static/img/hush.png" valign="middle" align="center" width="24" height="24" border="0">HUSH</td>
+      <td>{{hush}}</td>
+      <td>{{hush_usd}} $</td>
+      <td>{{hush_rub}} rub</td>
+  </tr>
+   <tr>
+      <td><img src="/static/img/kmd.png" valign="middle" align="center" width="24" height="24" border="0">KMD</td>
+      <td>{{kmd}}</td>
+      <td>{{kmd_usd}} $</td>
+      <td>{{kmd_rub}} rub</td>
+  </tr>
+   <tr>
+      <td><img src="/static/img/xvg.png" valign="middle" align="center" width="24" height="24" border="0">XVG</td>
+      <td>{{xvg}}</td>
+      <td>{{xvg_usd}} $</td>
+      <td>{{xvg_rub}} rub</td>
+  </tr>
+   <tr>
+      <td><img src="/static/img/xmr.png" valign="middle" align="center" width="24" height="24" border="0">XMR</td>
+      <td>{{xmr}}</td>
+      <td>{{xmr_usd}} $</td>
+      <td>{{xmr_rub}} rub</td>
+  </tr>
+   <tr>
+      <td><img src="/static/img/zec.png" valign="middle" align="center" width="24" height="24" border="0">ZEC</td>
+      <td>{{zec}}</td>
+      <td>{{xec_usd}} $</td>
+      <td>{{zec_rub}}rub</td>
+  </tr>
+   <tr>
+      <td><img src="/static/img/zcl.png" valign="middle" align="center" width="24" height="24" border="0">ZCL</td>
+      <td>{{zcl}}</td>
+      <td>{{zcl_usd}} $</td>
+      <td>{{zcl_rub}} rub</td>
+  </tr>
+  </table>
+ </body>
+</html>

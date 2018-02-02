@@ -7,7 +7,7 @@ from ConfigParser import SafeConfigParser
 import json
 import pandas as pd
 from flask import Flask, render_template
-from datetime import datetime
+from datetime import datetime as dt
 import csv
 from operator import itemgetter
 import tablib
@@ -18,6 +18,7 @@ WORK_DIR = os.path.dirname(os.path.realpath(__file__))
 COINS = os.path.join(WORK_DIR, 'coins.conf')
 API = os.path.join(WORK_DIR, 'api.conf')
 PRICES = os.path.join(WORK_DIR, 'price.csv')
+BALANCE = os.path.join(WORK_DIR, 'balance.csv')
 
 app = Flask(__name__)
 
@@ -35,26 +36,26 @@ ALGO = {'ETH': 'Ethash',
 
 
 @app.route('/')
+def index():
+	return render_template('index_old.html')
+
+
+@app.route('/main.html')
 def main():
-	dataset = tablib.Dataset()
-	with open(PRICES) as f:
-		dataset.csv = f.read()
-	data = dataset.html
-	return render_template('index.html', data=data)
+	return render_template('main.html')
 
 
-@app.route('/mrk1.html')
+@app.route('/market.html')
 def market():
 	dataset = tablib.Dataset()
 	with open(PRICES) as f:
 		dataset.csv = f.read()
 	data = dataset.html
-	return render_template('mrk1.html', data=data)
+	return render_template('market.html', data=data)
 
 
 @app.route('/balance.html')
 def balance():
-
 	return render_template('balance.html')
 
 
@@ -62,7 +63,12 @@ def balance():
 def date_time():
 	date = dt.strftime(dt.now(), "%d/%m/%Y")
 	time = dt.strftime(dt.now(), "%H:%M:%S")
-	return render_template('dt.html', date=date, time=time, uptime='uptime')
+	return render_template('dt.html', date=date, time=time)
+
+
+@app.route('/log.html')
+def log():
+	return render_template('log.html')
 
 
 def get_current_coin():
@@ -119,7 +125,7 @@ class MarketData(object):
 			for k,v in r.iteritems():
 				rez.append([k,v['USD'],v['RUB'],v['BTC']])
 			prices = sorted(rez, key=itemgetter(0))
-			header = ['COIN','USD','RUB','BTC']
+			header = ['Монета','Стоимость в USD','Стоимость в RUB','Стоимость в BTC']
 			with open(PRICES, 'wb') as f:
 				writer = csv.writer(f)
 				writer.writerow(header)
@@ -128,8 +134,10 @@ class MarketData(object):
 			sleep(self.interval)
 
 
-def main():
+
+def check_balance():
 	pass
+
 
 
 if __name__ == "__main__":
