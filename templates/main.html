@@ -5,19 +5,19 @@
   	<title>Main stats</title>
   	<style type="text/css">
         div {text-align: left;
-        	padding: 100px;
+        	padding: 45px;
         	color: white;     	
         }
     </style>
  </head>
  <body>
- 	<div id="main">
-    	<h2>Currently maining coin is {{ coin }}</h2>
-    	<h2>Current algorithm {{ algo }}</h2>
-   	 	<h2>Current process {{ pid }}</h2>
-   	 	<h2>Current status {{ status }}</h2>
-    	<h2>Stat 5 {{ stat5 }}</h2>
-    	<h2>Stat 6 {{ stat6 }}</h2>
+ 	  <div id="main">
+    	<h2>Currently maining coin is: <span style="color: green;">{{ stat['coin'] }} </span></h2>
+   	 	<h2>Current process: <span style="color: green;">{{ stat['pid'] }} </span></h2>
+   	 	<h2>Current status {{ stat['status'] }}</h2>
+    	<h2>Hashrate {{ stat5 }}</h2>
+    	<h2>Pool {{ stat6 }}</h2>
+      <h2>Uptime {{ stat7 }}</h2>
     </div>
  </body>
 </html>

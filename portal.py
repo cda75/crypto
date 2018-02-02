@@ -5,13 +5,12 @@ from time import sleep
 import os
 from ConfigParser import SafeConfigParser 
 import json
-import pandas as pd
 from flask import Flask, render_template
 from datetime import datetime as dt
 import csv
 from operator import itemgetter
-import tablib
 import threading
+from subprocess import Popen
 
 
 WORK_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -44,14 +43,23 @@ def index():
 
 @app.route('/main.html')
 def main():
-	coin = get_current_coin()
-	algo = ALGO[coin]
-	pid = get_current_pid
-	if (coin in ['ETC', 'ETH'] and pid == "EthDcrMiner64.exe") or (algo in ['x17','neoscrypt','lyra2rev2'] and pid == "ccminer-x64.exe"):
-		status = 'ACTIVE'
+	stat = dict()
+	stat['coin'] = get_current_coin()
+	#stat['algo'] = ALGO[stat['coin']]
+	stat['pid'] = get_current_pid()
+	
+	print stat['coin']
+	'''
+	if (stat['algo'] == 'Ethash' and stat['pid'] == "EthDcrMiner64.exe"):
+		stat['status'] = 'ACTIVE'
+	elif stat['algo'] in ['x17','neoscrypt','lyra2rev2'] and stat['pid'] == "ccminer-x64.exe":
+		stat['status'] = 'ACTIVE'
+	elif stat['algo'] == 'Equihash' and stat['pid'] == "zm.exe":
+		stat['status'] = 'ACTIVE'
 	else:
-		status = 'INACTIVE'
-	return render_template('main.html', coin, algo, pid, status)
+		stat['status'] = 'INACTIVE'
+		'''
+	return render_template('main.html', stat=stat)
 
 
 @app.route('/market.html')
@@ -95,6 +103,13 @@ def get_current_coin():
 def get_current_pid():
 	with open(PID, 'r') as f:
 		return f.read()
+
+
+def check_pid(pid):
+	if pid in Popen('tasklist', stdout=PIPE).communicate()[0]:
+		return True
+	else:
+		return False
 
 
 def get_balance(coin):

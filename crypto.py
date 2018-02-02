@@ -284,5 +284,5 @@ def nicehash_mining(t1=2, t2=12):
 
 if __name__ == "__main__":
 	while True:
-		#coin_mining(t1=0, t2=0.5, coins='XVG')
+		coin_mining(t1=0, t2=0.5, coins='XVG')
 		coin_mining(t2=8, coins='ETH, ETC, XVG, KMD, HASH, ZCL, ZEC')
