@@ -1,14 +1,30 @@
-<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8" />
-  <link rel="stylesheet" href="/static/css/style1.css">
-</head>
-<body>
-  <div> 
-    {% block body %}
-    {{ data|safe }}
-    {% endblock %}  
-  </div>
-</body>
+   <head>
+      <meta charset="utf-8" />
+      <link rel="stylesheet" href="/static/css/style1.css">
+   </head>
+   <body>
+   
+      <table>
+         <tr>
+            <th colspan="2">Монета</th>
+            <th>Стоимость в USD</th>
+            <th>Стоимость в RUB</th>
+            <th>Стоимость в BTC</th>
+         </tr>
+
+         {% for coin in data %}
+         
+         <tr>
+            <td><img src="/static/img/{{ coin[0] }}.png" width="24" height="24"></td>
+            <td>{{ coin[0] }}</td>
+            <td>{{ coin[1] }}</td>
+            <td>{{ coin[2] }}</td>
+            <td>{{ coin[3] }}</td>
+         </tr>
+            
+         {% endfor %}
+      </table>
+      
+   </body>
 </html>

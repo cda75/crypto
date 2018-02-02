@@ -37,7 +37,7 @@ ALGO = {'ETH': 'Ethash',
 
 @app.route('/')
 def index():
-	return render_template('index_old.html')
+	return render_template('index.html')
 
 
 @app.route('/main.html')
@@ -47,11 +47,18 @@ def main():
 
 @app.route('/market.html')
 def market():
-	dataset = tablib.Dataset()
-	with open(PRICES) as f:
-		dataset.csv = f.read()
-	data = dataset.html
-	return render_template('market.html', data=data)
+	API = "https://min-api.cryptocompare.com/data/pricemulti"
+	MY_COINS = 'BTC,ETH,ETC,ZEC,ZCL,XMR,XVG,KMD,HUSH'
+	MY_CUR = 'USD,RUB,BTC'
+	payload = {'fsyms': MY_COINS, 'tsyms': MY_CUR}
+	req = requests.get(API, params=payload)
+	r = req.json()
+	rez = []
+	for k,v in r.iteritems():
+		rez.append([k,v['USD'],v['RUB'],v['BTC']])
+	prices = sorted(rez, key=itemgetter(0))
+	return render_template('market.html', data=prices)
+
 
 
 @app.route('/balance.html')
@@ -135,13 +142,9 @@ class MarketData(object):
 
 
 
-def check_balance():
-	pass
-
-
 
 if __name__ == "__main__":
-	MarketData()
+	#MarketData()
 	app.run(debug = True)
 
 
