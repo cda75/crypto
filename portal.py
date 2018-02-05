@@ -22,6 +22,8 @@ BALANCE = os.path.join(WORK_DIR, 'balance.csv')
 PID = os.path.join(WORK_DIR, 'PID')
 COIN = os.path.join(WORK_DIR, 'COIN')
 
+MY_COINS = ['BTC','ETH','ETC','ZEC','XVG','ZCL','XMR','KMD','HUSH']
+
 app = Flask(__name__)
 
 ALGO = {'ETH': 'Ethash',
@@ -50,39 +52,29 @@ def main():
 	proc_name = get_process_name()
 	stat['process_name'] = proc_name
 	stat['uptime'] = get_process_uptime(proc_name)
-
-	'''
-	if (stat['algo'] == 'Ethash' and stat['pid'] == "EthDcrMiner64.exe"):
-		stat['status'] = 'ACTIVE'
-	elif stat['algo'] in ['x17','neoscrypt','lyra2rev2'] and stat['pid'] == "ccminer-x64.exe":
-		stat['status'] = 'ACTIVE'
-	elif stat['algo'] == 'Equihash' and stat['pid'] == "zm.exe":
-		stat['status'] = 'ACTIVE'
-	else:
-		stat['status'] = 'INACTIVE'
-		'''
 	return render_template('main.html', stat=stat)
 
 
 @app.route('/market.html')
 def market():
-	API = "https://min-api.cryptocompare.com/data/pricemulti"
-	MY_COINS = 'BTC,ETH,ETC,ZEC,ZCL,XMR,XVG,KMD,HUSH'
-	MY_CUR = 'USD,RUB,BTC'
-	payload = {'fsyms': MY_COINS, 'tsyms': MY_CUR}
-	req = requests.get(API, params=payload)
-	r = req.json()
-	rez = []
-	for k,v in r.iteritems():
-		rez.append([k,v['USD'],v['RUB'],v['BTC']])
-	prices = sorted(rez, key=itemgetter(0))
+	prices = get_market_prices()
 	return render_template('market.html', data=prices)
 
 
 
 @app.route('/balance.html')
 def balance():
-	return render_template('balance.html')
+	balance = []
+	for coin in MY_COINS:
+		v = get_coin_balance(coin)
+		v_usd, v_rub, v_btc = get_coin_price(coin)
+		v_usd = "{0:.4f}".format(v*v_usd)
+		v_rub = "{0:.4f}".format(v*v_rub)
+		v_rub = "{0:.4f}".format(v*v_btc)
+		v = "{0:.4f}".format(v)
+		coin_balance = [coin, v, v_usd, v_rub, v_btc]
+		balance.append(coin_balance)
+	return render_template('balance.html', balance=balance)
 
 
 @app.route('/dt.html')
@@ -90,11 +82,6 @@ def date_time():
 	date = dt.strftime(dt.now(), "%d/%m/%Y")
 	time = dt.strftime(dt.now(), "%H:%M:%S")
 	return render_template('dt.html', date=date, time=time)
-
-
-@app.route('/log.html')
-def log():
-	return render_template('log.html')
 
 
 def get_current_coin():
@@ -131,37 +118,53 @@ def get_process_uptime(process_name):
 	print "Process %s not found" %process_name
 
 
-def get_balance(coin):
-	requests.packages.urllib3.disable_warnings()
-	cfg = SafeConfigParser()
-	cfg.read(API)
-	if coin == "BTC":
-		url = cfg.get(coin, 'BALANCE')
-		req = requests.get(url)
-		value = float(req.json())/10**8
-	elif coin == "ZEC":
-		url = cfg.get(coin, 'BALANCE')
-		req = requests.get(url)
-		value = float(req.json()['balance'])
-	elif coin == 'XVG':
+def get_coin_balance(coin):
+	if coin in ['ZEC','BTC','ETH','ETC','XVG']:
+		requests.packages.urllib3.disable_warnings()
+		cfg = SafeConfigParser()
+		cfg.read(API)
 		url = cfg.get(coin, 'BALANCE')
 		req = requests.get(url, verify=False)
-		value = float(req.json())
-	elif coin in ['ZCL', 'KMD', 'HUSH']:
-		url = cfg.get(coin, 'API_URL')
-		api_key = cfg.get(coin, 'API_KEY')
-		arg = cfg.get(coin, 'USER_ID')
-		payload = {'page': 'api', 'action': 'getusertransactions', 'api_key': api_key}
-		req = requests.get(url, params=payload)
-		print req.url
-		value = 0
-		tx = req.json()['getusertransactions']['data']['transactions']
-		for i in tx:
-			if 'Debit' in i['type']:
-				value +=i['amount']
-	return value
+		if coin == "BTC":
+			value = float(req.json())/10**8
+		elif coin == 'ZEC':
+			value = float(req.json()['balance'])
+		elif coin in ["ETH", "ETC"]:
+			value = float(req.json()['balance'])/10**18
+		elif coin == 'XVG':
+			#req = requests.get(url, verify=False)
+			value = float(req.json())
+		return value
+	with open(BALANCE) as f:
+		reader = csv.reader(f)
+		value = dict()
+		for row in reader:
+			if row[0] == coin:
+				return float(row[1])
 
 
+def get_market_prices():
+	API = "https://min-api.cryptocompare.com/data/pricemulti"
+	MY_COINS = 'BTC,ETH,ETC,ZEC,XVG,ZCL,XMR,KMD,HUSH'
+	MY_CUR = 'USD,RUB,BTC'
+	payload = {'fsyms': MY_COINS, 'tsyms': MY_CUR}
+	req = requests.get(API, params=payload)
+	r = req.json()
+	rez = []
+	for k,v in r.iteritems():
+		rez.append([k,v['USD'],v['RUB'],v['BTC']])
+	return sorted(rez, key=itemgetter(0))
+
+
+
+def get_coin_price(coin):
+	prices = get_market_prices()
+	for price in prices:
+		if coin == price[0]:
+			return price[1], price[2], price[3]
+
+
+'''
 class MarketData(object):
 	def __init__(self, interval=60):
 		self.interval = interval
@@ -187,6 +190,9 @@ class MarketData(object):
 				for row in prices:
 					writer.writerow(row)
 			sleep(self.interval)
+
+'''
+
 
 
 
