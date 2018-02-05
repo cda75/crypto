@@ -77,11 +77,9 @@ def balance():
 	return render_template('balance.html', balance=balance)
 
 
-@app.route('/dt.html')
-def date_time():
-	date = dt.strftime(dt.now(), "%d/%m/%Y")
-	time = dt.strftime(dt.now(), "%H:%M:%S")
-	return render_template('dt.html', date=date, time=time)
+@app.route('/log.html')
+def log():
+	return render_template('log.html')
 
 
 def get_current_coin():
@@ -90,15 +88,9 @@ def get_current_coin():
 
 
 def get_process_name():
-	with open(PID, 'r') as f:
-		return f.read().strip()
+	lines = open(PID).readlines()
+	return [line.strip() for line in lines if line != '\n']
 
-
-def check_pid(pid):
-	if pid in Popen('tasklist', stdout=PIPE).communicate()[0]:
-		return True
-	else:
-		return False
 
 def get_pid_by_name(process_name):
 	for process in psutil.process_iter():
@@ -108,14 +100,14 @@ def get_pid_by_name(process_name):
 
 def get_process_uptime(process_name):
 	for process in psutil.process_iter():
-		if process_name.lower() == process.name().lower():
+		if process_name[0].lower() == process.name().lower():
 			create_time = process.create_time()
 			now = time()
 			diff = int(now - create_time)
 			m, s = divmod(diff,60)
 			h, m = divmod(m,60)
 			return "%02d:%02d:%02d" %(h,m,s)
-	print "Process %s not found" %process_name
+	print "Process %s not found" %process_name[0]
 
 
 def get_coin_balance(coin):
@@ -124,7 +116,7 @@ def get_coin_balance(coin):
 		cfg = SafeConfigParser()
 		cfg.read(API)
 		url = cfg.get(coin, 'BALANCE')
-		req = requests.get(url, verify=False)
+		req = requests.get(url)
 		if coin == "BTC":
 			value = float(req.json())/10**8
 		elif coin == 'ZEC':
@@ -132,9 +124,22 @@ def get_coin_balance(coin):
 		elif coin in ["ETH", "ETC"]:
 			value = float(req.json()['balance'])/10**18
 		elif coin == 'XVG':
-			#req = requests.get(url, verify=False)
+			req = requests.get(url, verify=False)
 			value = float(req.json())
 		return value
+	with open(BALANCE) as f:
+		reader = csv.reader(f)
+		value = dict()
+		for row in reader:
+			if row[0] == coin:
+				return float(row[1])
+
+
+def write_balance_to_csv():
+	pass
+
+
+def get_coin_balance_2(coin):
 	with open(BALANCE) as f:
 		reader = csv.reader(f)
 		value = dict()
@@ -152,7 +157,7 @@ def get_market_prices():
 	r = req.json()
 	rez = []
 	for k,v in r.iteritems():
-		rez.append([k,v['USD'],v['RUB'],v['BTC']])
+		rez.append([k, v['USD'], v['RUB'], v['BTC']])
 	return sorted(rez, key=itemgetter(0))
 
 
@@ -199,7 +204,10 @@ class MarketData(object):
 
 if __name__ == "__main__":
 	#MarketData()
-	app.run(host="0.0.0.0", debug = True)
+	#app.run(host="0.0.0.0", debug = True)
+	proc = get_process_name()
+	print proc
+	print get_process_uptime(proc)
 
 
 
