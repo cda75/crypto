@@ -13,11 +13,11 @@
  <body>
  	  <div id="main">
     	<h2>Currently maining coin is: <span style="color: green;">{{ stat['coin'] }} </span></h2>
-   	 	<h2>Current process: <span style="color: green;">{{ stat['pid'] }} </span></h2>
+   	 	<h2>Current process: <span style="color: green;">{{ stat['process_name'] }} </span></h2>
    	 	<h2>Current status {{ stat['status'] }}</h2>
     	<h2>Hashrate {{ stat5 }}</h2>
     	<h2>Pool {{ stat6 }}</h2>
-      <h2>Uptime {{ stat7 }}</h2>
+      <h2>Uptime {{ stat['uptime'] }}</h2>
     </div>
  </body>
 </html>

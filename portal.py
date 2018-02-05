@@ -46,9 +46,9 @@ def main():
 	stat = dict()
 	stat['coin'] = get_current_coin()
 	#stat['algo'] = ALGO[stat['coin']]
-	stat['pid'] = get_current_pid()
-	
-	print stat['coin']
+	stat['process_name'] = get_process_name()
+	stat['uptime'] = get_process_uptime(stat['process_name'])
+
 	'''
 	if (stat['algo'] == 'Ethash' and stat['pid'] == "EthDcrMiner64.exe"):
 		stat['status'] = 'ACTIVE'
@@ -100,7 +100,7 @@ def get_current_coin():
 		return f.read()
 
 
-def get_current_pid():
+def get_process_name():
 	with open(PID, 'r') as f:
 		return f.read()
 
@@ -110,6 +110,21 @@ def check_pid(pid):
 		return True
 	else:
 		return False
+
+def get_pid_by_name(process_name):
+	for process in psutil.process_iter():
+		if process_name.lower() == process.name().lower():
+			return process.pid
+
+def get_process_uptime(process_name):
+	for process in psutil.process_iter():
+		if process_name.lower() == process.name().lower():
+			create_time = process.create_time()
+			now = time()
+			diff = int(now - create_time)
+			m, s = divmod(diff,60)
+			h, m = divmod(m,60)
+			return "%02d:%02d:%02d" %(h,m,s)
 
 
 def get_balance(coin):
