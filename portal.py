@@ -47,8 +47,9 @@ def main():
 	stat = dict()
 	stat['coin'] = get_current_coin()
 	#stat['algo'] = ALGO[stat['coin']]
-	stat['process_name'] = get_process_name()
-	stat['uptime'] = get_process_uptime(stat['process_name'])
+	proc_name = get_process_name()
+	stat['process_name'] = proc_name
+	stat['uptime'] = get_process_uptime(proc_name)
 
 	'''
 	if (stat['algo'] == 'Ethash' and stat['pid'] == "EthDcrMiner64.exe"):
