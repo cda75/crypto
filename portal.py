@@ -104,7 +104,7 @@ def get_current_coin():
 
 def get_process_name():
 	with open(PID, 'r') as f:
-		return f.read()
+		return f.read().strip()
 
 
 def check_pid(pid):
@@ -118,6 +118,7 @@ def get_pid_by_name(process_name):
 		if process_name.lower() == process.name().lower():
 			return process.pid
 
+
 def get_process_uptime(process_name):
 	for process in psutil.process_iter():
 		if process_name.lower() == process.name().lower():
@@ -127,6 +128,7 @@ def get_process_uptime(process_name):
 			m, s = divmod(diff,60)
 			h, m = divmod(m,60)
 			return "%02d:%02d:%02d" %(h,m,s)
+	print "Process %s not found" %process_name
 
 
 def get_balance(coin):
