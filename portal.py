@@ -116,7 +116,7 @@ def get_coin_balance(coin):
 		cfg = SafeConfigParser()
 		cfg.read(API)
 		url = cfg.get(coin, 'BALANCE')
-		req = requests.get(url)
+		req = requests.get(url, verify=False)
 		if coin == "BTC":
 			value = float(req.json())/10**8
 		elif coin == 'ZEC':
@@ -124,7 +124,6 @@ def get_coin_balance(coin):
 		elif coin in ["ETH", "ETC"]:
 			value = float(req.json()['balance'])/10**18
 		elif coin == 'XVG':
-			req = requests.get(url, verify=False)
 			value = float(req.json())
 		return value
 	with open(BALANCE) as f:
@@ -204,10 +203,8 @@ class MarketData(object):
 
 if __name__ == "__main__":
 	#MarketData()
-	#app.run(host="0.0.0.0", debug = True)
-	proc = get_process_name()
-	print proc
-	print get_process_uptime(proc)
+	app.run(host="0.0.0.0", debug = True)
+	
 
 
 
