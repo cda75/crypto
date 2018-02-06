@@ -16,7 +16,7 @@ import psutil
 
 WORK_DIR = os.path.dirname(os.path.realpath(__file__))
 COINS = os.path.join(WORK_DIR, 'coins.conf')
-#API = os.path.join(WORK_DIR, 'api.conf')
+API = os.path.join(WORK_DIR, 'api.conf')
 PRICES = os.path.join(WORK_DIR, 'price.csv')
 BALANCE = os.path.join(WORK_DIR, 'balance.csv')
 PID = os.path.join(WORK_DIR, 'PID')
@@ -96,8 +96,6 @@ def get_process_uptime(process_name):
 
 
 def get_coin_balance(coin):
-<<<<<<< HEAD
-=======
 	if coin in ['ZEC','BTC','ETH','ETC','XVG']:
 		requests.packages.urllib3.disable_warnings()
 		cfg = SafeConfigParser()
@@ -126,7 +124,6 @@ def write_balance_to_csv():
 
 
 def get_coin_balance_2(coin):
->>>>>>> 67f27689fba136d4de27821434eb09a751422fac
 	with open(BALANCE) as f:
 		reader = csv.reader(f)
 		value = dict()
@@ -226,15 +223,12 @@ class MarketData(object):
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
-	BalanceData(interval=60)
+	BalanceData(interval=3600)
 	app.run(host="0.0.0.0", debug = True)
 
-=======
-	#MarketData()
-	app.run(host="0.0.0.0", debug = True)
+
 	
->>>>>>> 67f27689fba136d4de27821434eb09a751422fac
+
 
 
 
