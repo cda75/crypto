@@ -96,6 +96,37 @@ def get_process_uptime(process_name):
 
 
 def get_coin_balance(coin):
+<<<<<<< HEAD
+=======
+	if coin in ['ZEC','BTC','ETH','ETC','XVG']:
+		requests.packages.urllib3.disable_warnings()
+		cfg = SafeConfigParser()
+		cfg.read(API)
+		url = cfg.get(coin, 'BALANCE')
+		req = requests.get(url, verify=False)
+		if coin == "BTC":
+			value = float(req.json())/10**8
+		elif coin == 'ZEC':
+			value = float(req.json()['balance'])
+		elif coin in ["ETH", "ETC"]:
+			value = float(req.json()['balance'])/10**18
+		elif coin == 'XVG':
+			value = float(req.json())
+		return value
+	with open(BALANCE) as f:
+		reader = csv.reader(f)
+		value = dict()
+		for row in reader:
+			if row[0] == coin:
+				return float(row[1])
+
+
+def write_balance_to_csv():
+	pass
+
+
+def get_coin_balance_2(coin):
+>>>>>>> 67f27689fba136d4de27821434eb09a751422fac
 	with open(BALANCE) as f:
 		reader = csv.reader(f)
 		value = dict()
@@ -195,9 +226,15 @@ class MarketData(object):
 
 
 if __name__ == "__main__":
+<<<<<<< HEAD
 	BalanceData(interval=60)
 	app.run(host="0.0.0.0", debug = True)
 
+=======
+	#MarketData()
+	app.run(host="0.0.0.0", debug = True)
+	
+>>>>>>> 67f27689fba136d4de27821434eb09a751422fac
 
 
 
