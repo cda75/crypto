@@ -20,12 +20,15 @@ LOG = os.path.join(WORK_DIR, 'mining.log')
 PID = os.path.join(WORK_DIR, 'PID')
 COIN = os.path.join(WORK_DIR, 'COIN')
 
+LOGGING = "NO" # YES/NO
+
 
 def logging(info):
 	time = "[%s] " %datetime.strftime(datetime.now(), "%d/%m %H:%M:%S")
 	print time+info
-	with open(LOG, 'a') as f:
-		f.write(time+info+'\n')
+	if LOGGING == "YES":
+		with open(LOG, 'a') as f:
+			f.write(time+info+'\n')
 
 
 def kill_current_miner():

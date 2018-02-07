@@ -16,7 +16,7 @@ import psutil
 
 WORK_DIR = os.path.dirname(os.path.realpath(__file__))
 COINS = os.path.join(WORK_DIR, 'coins.conf')
-API = os.path.join(WORK_DIR, 'api.conf')
+#API = os.path.join(WORK_DIR, 'api.conf')
 PRICES = os.path.join(WORK_DIR, 'price.csv')
 BALANCE = os.path.join(WORK_DIR, 'balance.csv')
 PID = os.path.join(WORK_DIR, 'PID')
@@ -50,16 +50,26 @@ def market():
 @app.route('/balance.html')
 def balance():
 	balance = []
+	total = dict()
+	total['USD'] = 0
+	total['RUB'] = 0
+	total['BTC'] = 0
 	for coin in MY_COINS:
-		v = get_coin_balance(coin)
-		v_usd, v_rub, v_btc = get_coin_price(coin)
-		v_usd = "{0:.4f}".format(v*v_usd)
-		v_rub = "{0:.4f}".format(v*v_rub)
-		v_rub = "{0:.4f}".format(v*v_btc)
-		v = "{0:.4f}".format(v)
-		coin_balance = [coin, v, v_usd, v_rub, v_btc]
+		coin_value = get_coin_balance(coin)
+		usd_price, rub_price, btc_price = get_coin_price(coin)
+		usd_value = usd_price * coin_value
+		rub_value = rub_price * coin_value
+		btc_value = btc_price * coin_value
+		total['USD'] += usd_value
+		total['RUB'] += rub_value
+		total['BTC'] += btc_value
+		coin_value = "{0:.4f}".format(coin_value)
+		usd_value = "{0:.4f}".format(usd_value)
+		rub_value = "{0:.4f}".format(rub_value)
+		btc_value = "{0:.4f}".format(btc_value)		
+		coin_balance = [coin, coin_value, usd_value, rub_value, btc_value]
 		balance.append(coin_balance)
-	return render_template('balance.html', balance=balance)
+	return render_template('balance.html', balance=balance, total=total)
 
 
 @app.route('/log.html')
@@ -137,26 +147,28 @@ class BalanceData(object):
 		requests.packages.urllib3.disable_warnings()
 		cfg = SafeConfigParser()
 		cfg.read(self.API)
-		with open(self.BALANCE) as f:
-			lines = list(csv.reader(f))
-		for coin in self.COINS:
-			url = cfg.get(coin, 'BALANCE')
-			req = requests.get(url, verify=False)
-			if coin == "BTC":
-				value = float(req.json())/10**8
-			elif coin == 'ZEC':
-				value = float(req.json()['balance'])
-			elif coin in ["ETH", "ETC"]:
-				value = float(req.json()['balance'])/10**18
-			elif coin == 'XVG':
-				value = float(req.json())		
+		while True:
+			with open(self.BALANCE) as f:
+				lines = list(csv.reader(f))
+			for coin in self.COINS:
+				url = cfg.get(coin, 'BALANCE')
+				req = requests.get(url, verify=False)
+				if coin == "BTC":
+					value = float(req.json())/10**8
+				elif coin == 'ZEC':
+					value = float(req.json()['balance'])
+				elif coin in ["ETH", "ETC"]:
+					value = float(req.json()['balance'])/10**18
+				elif coin == 'XVG':
+					value = float(req.json())		
 			for line in lines:
 				if line[0] == coin:
 					line[1] = value
-		with open(BALANCE, 'wb') as f:
-			writer = csv.writer(f)
-			writer.writerows(lines)
-		sleep(self.interval)
+			print lines
+			with open(BALANCE, 'wb') as f:
+				writer = csv.writer(f)
+				writer.writerows(lines)
+			sleep(self.interval)
 
 		
 
@@ -195,11 +207,8 @@ class MarketData(object):
 
 
 if __name__ == "__main__":
-	BalanceData(interval=3600)
+	BalanceData(interval=60)
 	app.run(host="0.0.0.0", debug = True)
-
-
-	
 
 
 
