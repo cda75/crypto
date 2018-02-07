@@ -12,10 +12,11 @@
  </head>
  <body>
  	  <div id="main">
-    	<h2>CURRENT COIN: <span style="color: green;">{{ stat['coin'] }} </span></h2>
-   	 	<h2>CURRENT PROCESS: <span style="color: green;">{{ stat['process_name'] }} </span></h2>
-      	<h2>UPTIME: <span style="color: green;">{{ stat['uptime'] }} </span></h2>
-      	<h2>HASHRATE: <span style="color: green;">{{ stat['hashrate'] }} </span></h2>
+      	<h2>MINING: 
+          <img src="/static/img/{{ stat['coin'][:3] }}.png" width="28" height="28">
+          <span style="color: green;">{{ stat['coin'] }} </span></h2>
+       	<h2>UPTIME: <span style="color: green;">{{ stat['uptime'] }} </span></h2>
+       	<h2>HASHRATE: <span style="color: green;">{{ stat['hashrate'] }} </span></h2>
       	<h2>UNPAID BALANCE: <span style="color: green;">{{ stat['unpaid'] }} </span></h2>
       	<h2>UNCONFIRMED BALANCE: <span style="color: green;">{{ stat['unconfirmed'] }} </span></h2>
     </div>
