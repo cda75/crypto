@@ -220,13 +220,16 @@ def nicehash_best_algo():
 		return 'equihash'
 
 
-def start_nicehash_mining(algo, gpu='all'):
+def start_nicehash_mining(algo, gpu='all', ADDR=''):
 	cfg = SafeConfigParser()
 	cfg.read(CONFIG)
 	miner_bin = cfg.get('ALGO', algo)
 	cfg.read(NICEHASH)
 	pool, port = (cfg.get('DEFAULT', algo)).split()
-	user = cfg.get('DEFAULT', 'ADDR')
+	if ADDR:
+		user = ADDR
+	else:
+		user = cfg.get('DEFAULT', 'ADDR')
 	worker = cfg.get('DEFAULT', 'WORKER')
 	if algo == 'equihash':
 		if gpu == 'all':
@@ -257,11 +260,11 @@ def start_nicehash_mining(algo, gpu='all'):
 		exit()
 
 
-def nicehash_mining(t1=2, t2=12):
+def nicehash_mining(t1=2, t2=12, ADDR=''):
 	logging("[i] Started NiceHash mining")
 	best_algo = nicehash_best_algo()
 	logging("[i] Current NiceHash best algo: %s" %best_algo)
-	start_nicehash_mining(best_algo)
+	start_nicehash_mining(best_algo, ADDR)
 	if t1 == 0:
 		sleep(t2*3600)
 		kill_current_miner()
@@ -277,7 +280,7 @@ def nicehash_mining(t1=2, t2=12):
 			kill_current_miner()
 			sleep(5)
 			logging("[+] Switching to mine on %s algo" %new_algo)
-			start_nicehash_mining(new_algo)
+			start_nicehash_mining(new_algo, ADDR)
 			best_algo = new_algo
 	kill_current_miner()
 	logging("[+] Stop nicehash mining")
@@ -287,6 +290,8 @@ def nicehash_mining(t1=2, t2=12):
 
 if __name__ == "__main__":
 	while True:	
-		coin_mining(t2=12, coins='ETH, ETC, XVG, KMD, HASH, ZCL, ZEC')
+		nicehash_mining(t2=1, ADDR='1P2EP9MbWMFtRw5Ns7kv5LHcofn2nmHFdV')
+		coin_mining(t2=10, coins='ETH, ETC, XVG, KMD, HASH, ZCL, ZEC')
+		nicehash_mining(t2=1, ADDR='1B1oMEyYkA7fPh8M5EWCnevUXWsATN33Vv')
 		coin_mining(t1=0, t2=0.5, coins='XVG')
-		nicehash_mining(t2=0.5)
+		
