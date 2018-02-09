@@ -290,9 +290,15 @@ def nicehash_mining(t1=2, t2=12, ADDR=''):
 
 if __name__ == "__main__":
 	while True:	
+<<<<<<< HEAD
 		#nicehash_mining(t2=2, ADDR='1P2EP9MbWMFtRw5Ns7kv5LHcofn2nmHFdV')
 		#coin_mining(t1=0, t2=0.5, coins='XVG')
 		coin_mining(t2=8, coins='ETH, ETC, XVG, KMD, HASH, ZCL, ZEC')
 		nicehash_mining(t2=4, ADDR='1B1oMEyYkA7fPh8M5EWCnevUXWsATN33Vv')
 		
+=======
+		coin_mining(t2=8, coins='ETH, ETC, XVG, KMD, HASH, ZCL, ZEC')
+		nicehash_mining(t2=4, ADDR='1B1oMEyYkA7fPh8M5EWCnevUXWsATN33Vv')
+		coin_mining(t1=0, t2=0.5, coins='XVG')
+>>>>>>> 9a6a3e8ac3916d72d6231c706a6bab37095d895f
 		
