@@ -164,7 +164,6 @@ class BalanceData(object):
 			for line in lines:
 				if line[0] == coin:
 					line[1] = value
-			print lines
 			with open(BALANCE, 'wb') as f:
 				writer = csv.writer(f)
 				writer.writerows(lines)
@@ -207,7 +206,7 @@ class MarketData(object):
 
 
 if __name__ == "__main__":
-	BalanceData(interval=60)
+	BalanceData()
 	app.run(host="0.0.0.0", debug = True)
 
 
