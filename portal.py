@@ -51,30 +51,32 @@ def market():
 def balance():
 	balance = []
 	total = dict()
-	total['USD'] = 0
-	total['RUB'] = 0
-	total['BTC'] = 0
+	total_usd = 0
+	total_rub = 0
+	total_btc = 0
 	for coin in MY_COINS:
 		coin_value = get_coin_balance(coin)
 		usd_price, rub_price, btc_price = get_coin_price(coin)
 		usd_value = usd_price * coin_value
 		rub_value = rub_price * coin_value
 		btc_value = btc_price * coin_value
-		total['USD'] += usd_value
-		total['RUB'] += rub_value
-		total['BTC'] += btc_value
-		coin_value = "{0:.4f}".format(coin_value)
-		usd_value = "{0:.4f}".format(usd_value)
-		rub_value = "{0:.4f}".format(rub_value)
-		btc_value = "{0:.4f}".format(btc_value)		
+		total_usd += usd_value
+		total_rub += rub_value
+		total_btc += btc_value
+		coin_value, usd_value, rub_value, btc_value = format_float(coin_value, usd_value, rub_value, btc_value)
 		coin_balance = [coin, coin_value, usd_value, rub_value, btc_value]
 		balance.append(coin_balance)
+		total['USD'], total['RUB'], total['BTC'] = format_float(total_usd, total_rub, total_btc)
 	return render_template('balance.html', balance=balance, total=total)
 
 
 @app.route('/log.html')
 def log():
 	return render_template('log.html')
+
+
+def format_float(*args):
+	return ["{0:.2f}".format(arg) for arg in args]
 
 
 def get_current_coin():
