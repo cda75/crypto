@@ -9,6 +9,17 @@ from ConfigParser import SafeConfigParser
 import threading
 
 
+
+WORK_DIR = os.path.dirname(os.path.realpath(__file__))
+CONFIG = os.path.join(WORK_DIR, 'config.conf')
+COINS = os.path.join(WORK_DIR, 'coins.conf')
+BENCHMARK = os.path.join(WORK_DIR, 'benchmark.conf')
+NICEHASH = os.path.join(WORK_DIR, 'nicehash.conf')
+LOG = os.path.join(WORK_DIR, 'mining.log')
+PID = os.path.join(WORK_DIR, 'PID')
+COIN = os.path.join(WORK_DIR, 'COIN')
+
+
 class Miner(object):
 	def __init__(self, coin='ZEC', log=False):
 		self.__set_parameters(coin)
@@ -34,7 +45,7 @@ class Miner(object):
 		self.__pid = os.path.basename(self.__bin)
 
 	def set_coin(self, coin):
-		self.__coin = coin
+		self.__set_parameters(coin)
 
 	def get_coin(self):
 		return self.__coin
@@ -45,20 +56,31 @@ class Miner(object):
 	def get_pid(self):
 		return self.__pid
 
+	def get_pool(self):
+		return self.__pool
+
+	def get_bin(self):
+		return self.__bin
+
+	def get_addr(self):
+		return self.__addr
+
 	def set_equihash_bin(self, prog_bin):
 		self.__equihash_bin = prog_bin
+		if self.__algo == 'equihash':
+			cfg = SafeConfigParser()
+			cfg.read(CONFIG)
+			self.__bin = cfg.get('ALGO', prog_bin.lower())
+			self.__pid = os.path.basename(self.__bin)
 
 	def __logging(self, info):
 		time = "[%s] " %datetime.strftime(datetime.now(), "%d/%m %H:%M:%S")
 		print time+info
 		if self.log:
 			with open(LOG, 'a') as f:
-				f.write(time+info+'\n')
-
-	def __write_pid(self):
+				f.write(time+info+'\n')	
 		
-		
-	def run(self):	
+	def start(self):	
 		if self.__algo == 'equihash':
 			if self.__equihash_bin == 'ewbf':
 				cmdStr = "%s --server %s --port %s --user %s.%s --api 0.0.0.0:42000 --fee 0" %(miner_bin, pool, port, user, worker)
@@ -79,11 +101,6 @@ class Miner(object):
 			self.__logging("[-] ERROR started %s mining\nExit\n" %self.__coin)
 			exit()
 
-	
-	def start(self):
-		thread = threading.Thread(target=self.run, args=())
-		thread.daemon = True                         
-		thread.start()
 
 	def stop(self):
 		cmdStr = "taskkill /f /im %s" %(self.__pid)
