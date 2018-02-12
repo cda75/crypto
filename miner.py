@@ -83,9 +83,9 @@ class Miner(object):
 	def start(self):	
 		if self.__algo == 'equihash':
 			if self.__equihash_bin == 'ewbf':
-				cmdStr = "%s --server %s --port %s --user %s.%s --api 0.0.0.0:42000 --fee 0" %(miner_bin, pool, port, user, worker)
+				cmdStr = "%s --server %s --port %s --user %s.%s --api 0.0.0.0:42000 --fee 0" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker)
 			else:
-				cmdStr = "%s --server %s --port %s --user %s.%s --telemetry=0.0.0.0:42000" %(miner_bin, pool, port, user, worker)
+				cmdStr = "%s --server %s --port %s --user %s.%s --telemetry=0.0.0.0:42000" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker)
 		elif self.__algo == 'ethash':
 			cmdStr = "%s -di 023 -epool %s:%s -ewal %s.%s " %(self.__bin, self.__pool, self.__port, self.__user, self.__worker)
 		else:
