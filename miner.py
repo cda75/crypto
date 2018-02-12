@@ -89,7 +89,7 @@ class Miner(object):
 				cmdStr.append("%s --server %s --port %s --user %s.%s --telemetry=0.0.0.0:42000" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
 		elif self.__algo == 'ethash':
 			cmdStr.append("%s -di 023 -epool %s:%s -ewal %s.%s " %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
-			eth_pid = self.__pid
+			eth_pid = self.__pid[0]
 			self.__set_parameters('ZEC')
 			if self.__equihash_bin == 'ewbf':
 				cmdStr.append("%s --server %s --cuda_devices 1 --port %s --user %s.%s --api 0.0.0.0:42000 --fee 0" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
