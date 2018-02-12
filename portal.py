@@ -4,13 +4,13 @@ import requests
 from time import sleep, time
 import os
 from ConfigParser import SafeConfigParser 
-import json
+#import json
 from flask import Flask, render_template
 from datetime import datetime as dt
 import csv
 from operator import itemgetter
 import threading
-from subprocess import Popen
+#from subprocess import Popen
 import psutil
 
 
@@ -108,6 +108,11 @@ def get_process_uptime(process_name):
 	print "Process %s not found" %process_name[0]
 
 
+def get_total_uptime():
+	proc_name = 'Python.exe'
+	return get_process_uptime(proc_name)
+
+
 def get_coin_balance(coin):
 	with open(BALANCE) as f:
 		reader = csv.reader(f)
@@ -171,39 +176,6 @@ class BalanceData(object):
 				writer = csv.writer(f)
 				writer.writerows(lines)
 			sleep(self.interval)
-
-		
-
-
-'''
-class MarketData(object):
-	def __init__(self, interval=60):
-		self.interval = interval
-		self.API = "https://min-api.cryptocompare.com/data/pricemulti"
-		self.MY_COINS = 'BTC,ETH,ETC,ZEC,ZCL,XMR,XVG,KMD,HUSH'
-		self.MY_CUR = 'USD,RUB,BTC'
-		thread = threading.Thread(target=self.run, args=())
-		thread.daemon = True                         
-		thread.start()
-	def run(self):
-		while True:
-			payload = {'fsyms': self.MY_COINS, 'tsyms': self.MY_CUR}
-			req = requests.get(self.API, params=payload)
-			r = req.json()
-			rez = []
-			for k,v in r.iteritems():
-				rez.append([k,v['USD'],v['RUB'],v['BTC']])
-			prices = sorted(rez, key=itemgetter(0))
-			header = ['Монета','Стоимость в USD','Стоимость в RUB','Стоимость в BTC']
-			with open(PRICES, 'wb') as f:
-				writer = csv.writer(f)
-				writer.writerow(header)
-				for row in prices:
-					writer.writerow(row)
-			sleep(self.interval)
-
-'''
-
 
 
 

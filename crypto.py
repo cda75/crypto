@@ -8,11 +8,12 @@ from subprocess import Popen, PIPE, CREATE_NEW_CONSOLE
 import psutil
 from ConfigParser import SafeConfigParser 
 import operator
+import threading
 
 
 
 WORK_DIR = os.path.dirname(os.path.realpath(__file__))
-CONFIG = os.path.join(WORK_DIR, 'config.txt')
+CONFIG = os.path.join(WORK_DIR, 'config.conf')
 COINS = os.path.join(WORK_DIR, 'coins.conf')
 BENCHMARK = os.path.join(WORK_DIR, 'benchmark.conf')
 NICEHASH = os.path.join(WORK_DIR, 'nicehash.conf')
@@ -21,6 +22,7 @@ PID = os.path.join(WORK_DIR, 'PID')
 COIN = os.path.join(WORK_DIR, 'COIN')
 
 LOGGING = "NO" # YES/NO
+EQUIHASH_MINER = "DTSM" # DTSM/EWBF
 
 
 def logging(info):
@@ -31,11 +33,20 @@ def logging(info):
 			f.write(time+info+'\n')
 
 
+def kill_pid(pid):
+	cmdStr = "taskkill /f /im %s" %(pid)
+	try:	
+		os.system(cmdStr)
+	except:
+		return False
+
+
 def kill_current_miner():
 	pids = get_pid()
 	for pid in pids:
-		cmdStr = "taskkill /f /im %s" %(pid)
-		os.system(cmdStr)
+		kill_pid(pid)
+	with open(COIN, 'w') as f:
+		f.write('')
 
 
 def write_pid(*pids):
@@ -44,22 +55,20 @@ def write_pid(*pids):
 			f.write(pid+'\n')
 
 
-def write_coin(coin):
-	with open(COIN, 'w') as f:
-		f.write(coin)
-
-
 def get_pid():
 	with open(PID) as f:
 		pids = f.readlines()
 	return [pid.strip() for pid in pids]
 
 
-def check_pid(pid):
-	if pid in Popen('tasklist', stdout=PIPE).communicate()[0]:
-		return True
-	else:
-		return False
+def write_coin(coin):
+	with open(COIN, 'w') as f:
+		f.write(coin)
+
+
+def get_coin():
+	with open(COIN) as f:
+		return f.read(coin)
 
 
 def set_env():
@@ -160,6 +169,7 @@ def start_coin_mining(coin):
 		write_pid(pid)
 		write_coin(coin)
 		logging("[+] Successfully started %s mining\n" %coin)
+		#Checker()
 	except:
 		logging("[-] ERROR starting %s miner\nExit\n" %coin)
 		exit()
@@ -288,11 +298,42 @@ def nicehash_mining(t1=2, t2=12, ADDR=''):
 
 
 
+class Checker(object):
+	def __init__(self, coin, interval=180):
+		self.interval = interval
+		self.coin = coin
+		self.cfg = SafeConfigParser()
+		thread = threading.Thread(target=self.run, args=())
+		thread.daemon = True                         
+		thread.start()
+
+	def restart(self, pid):
+		kill_pid(pid)
+		start_coin_mining(self.coin)
+
+	def check_pid(self):
+		self.cfg.read(COINS)
+		algo = self.cfg.get(self.coin, 'ALGO')
+		self.cfg.read(CONFIG)
+		pid = os.path.basename(self.cfg.get('ALGO', algo))
+		if pid in Popen('tasklist', stdout=PIPE).communicate()[0]:
+			return pid
+		else:
+			return False
+		
+	def run(self):
+		while True:
+			pid = self.check_pid()
+			if not pid:
+				self.restart(pid)
+			else:
+				sleep(self.interval)
+
+
+
 if __name__ == "__main__":
-	while True:	
-		#nicehash_mining(t2=2, ADDR='1P2EP9MbWMFtRw5Ns7kv5LHcofn2nmHFdV')
 		coin_mining(t1=0, t2=0.5, coins='XVG')
 		coin_mining(t2=8, coins='ETH, ETC, XVG, KMD, HASH, ZCL, ZEC')
 #		nicehash_mining(t2=4, ADDR='1B1oMEyYkA7fPh8M5EWCnevUXWsATN33Vv')
-		coin_mining(t1=0, t2=0.5, coins='XVG')
+#		coin_mining(t1=0, t2=0.5, coins='XVG')
 		
