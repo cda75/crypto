@@ -71,7 +71,7 @@ class Miner(object):
 			cfg = SafeConfigParser()
 			cfg.read(CONFIG)
 			self.__bin = cfg.get('ALGO', prog_bin.lower())
-			self.__pid = os.path.basename(self.__bin)
+			self.__pid = [os.path.basename(self.__bin)]
 
 	def __logging(self, info):
 		time = "[%s] " %datetime.strftime(datetime.now(), "%d/%m %H:%M:%S")
@@ -89,13 +89,14 @@ class Miner(object):
 				cmdStr.append("%s --server %s --port %s --user %s.%s --telemetry=0.0.0.0:42000" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
 		elif self.__algo == 'ethash':
 			cmdStr.append("%s -di 023 -epool %s:%s -ewal %s.%s " %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
+			eth_pid = self.__pid
 			self.__set_parameters('ZEC')
 			if self.__equihash_bin == 'ewbf':
 				cmdStr.append("%s --server %s --cuda_devices 1 --port %s --user %s.%s --api 0.0.0.0:42000 --fee 0" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
 			else:
 				cmdStr.append("%s --server %s --dev 1 --port %s --user %s.%s --telemetry=0.0.0.0:42000" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
 			self.__coin = "ETH ZEC"
-			self.__pid.append('ZEC')
+			self.__pid.append(eth_pid)
 		else:
 			cmdStr.append("%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(self.__bin, self.__algo, self.__pool, self.__port, self.__user, self.__worker))
 		try:
