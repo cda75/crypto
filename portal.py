@@ -56,6 +56,7 @@ def balance():
 	total_btc = 0
 	for coin in MY_COINS:
 		coin_value = get_coin_balance(coin)
+		print coin, coin_value
 		usd_price, rub_price, btc_price = get_coin_price(coin)
 		usd_value = usd_price * coin_value
 		rub_value = rub_price * coin_value
@@ -163,9 +164,9 @@ class BalanceData(object):
 					value = float(req.json()['balance'])/10**18
 				elif coin == 'XVG':
 					value = float(req.json())		
-			for line in lines:
-				if line[0] == coin:
-					line[1] = value
+				for line in lines:
+					if line[0] == coin:
+						line[1] = value
 			with open(BALANCE, 'wb') as f:
 				writer = csv.writer(f)
 				writer.writerows(lines)
