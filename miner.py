@@ -13,8 +13,6 @@ import threading
 WORK_DIR = os.path.dirname(os.path.realpath(__file__))
 CONFIG = os.path.join(WORK_DIR, 'config.conf')
 COINS = os.path.join(WORK_DIR, 'coins.conf')
-BENCHMARK = os.path.join(WORK_DIR, 'benchmark.conf')
-NICEHASH = os.path.join(WORK_DIR, 'nicehash.conf')
 LOG = os.path.join(WORK_DIR, 'mining.log')
 PID = os.path.join(WORK_DIR, 'PID')
 COIN = os.path.join(WORK_DIR, 'COIN')
@@ -116,7 +114,10 @@ class Miner(object):
 				self.__logging("[-] Error stopping process\n" %pid)
 
 	def restart(self):
-		pass
+		self.stop()
+		self.start()
+
+
 	def check(self):
 		pass
 
