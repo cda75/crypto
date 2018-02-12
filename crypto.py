@@ -44,8 +44,11 @@ def kill_pid(pid):
 def kill_current_miner():
 	pids = get_pid()
 	for pid in pids:
-		kill_pid(pid)
+		if check_pid(pid):
+			kill_pid(pid)
 	with open(COIN, 'w') as f:
+		f.write('')
+	with open(PID, 'w')	 as f:
 		f.write('')
 
 
@@ -59,6 +62,13 @@ def get_pid():
 	with open(PID) as f:
 		pids = f.readlines()
 	return [pid.strip() for pid in pids]
+
+
+def check_pid(pid):
+	if pid in Popen('tasklist', stdout=PIPE).communicate()[0]:
+		return True
+	else:
+		return False
 
 
 def write_coin(coin):
