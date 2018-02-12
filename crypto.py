@@ -176,31 +176,28 @@ def start_coin_mining(coin):
 
 
 def coin_mining(t1=30, t2=12, coins='all'):
-	logging("[i] Started coin mining")
-	coin = get_best_coin(coins)
-	logging("[i] My current most profitable coin is %s" %coin)
-	start_coin_mining(coin)
-	if t1 == 0:
-		sleep(t2*3600)
-		kill_current_miner()
-		return 1
-	cycles = int(60/t1*t2)
-	for i in range(cycles):
-		sleep(t1*60)
-		new_coin = get_best_coin(coins)
-		if new_coin == coin:
-			logging("[+] Continue mining %s\n" %coin)
+	N = int(60/t1*t2)
+	logging("[i] Starting coin mining")
+	best_coin = ''
+	for i in range(N):
+		new_best_coin = get_best_coin(coins)
+		if new_best_coin == best_coin:
+			logging("[+] Continue mining %s\n" %best_coin)
 		else:
-			logging("[i] New most profitable coin is %s" %new_coin)
+			logging("[i] New most profitable coin is %s" %new_best_coin)
 			kill_current_miner()
-			sleep(5)
-			logging("[+] Switching to mine %s" %new_coin)
-			start_coin_mining(new_coin)
-			coin = new_coin
+			sleep(3)
+			logging("[i] Switching to mine %s" %new_best_coin)
+			start_coin_mining(new_best_coin)
+			best_coin = new_best_coin
+		sleep(t1*60)
 	kill_current_miner()
 	logging("[+] Stop coin mining")
 	logging("---------------------------------------------------------------------\n")
 
+
+
+# FOR NICEHASH MINING
 
 def nicehash_best_algo():
 	cfg = SafeConfigParser()
@@ -297,7 +294,7 @@ def nicehash_mining(t1=2, t2=12, ADDR=''):
 	logging("----------------------------------------------------------------------\n")
 
 
-
+'''
 class Checker(object):
 	def __init__(self, coin, interval=180):
 		self.interval = interval
@@ -328,7 +325,7 @@ class Checker(object):
 				self.restart(pid)
 			else:
 				sleep(self.interval)
-
+'''
 
 
 if __name__ == "__main__":
