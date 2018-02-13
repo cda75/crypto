@@ -174,12 +174,8 @@ def get_best_coin(coins='all'):
 		return 'ZEC'
 
 
-def coin_mining(coin='all', check_time=0.5):
-	if coin != 'all':
-		m = Miner(coin)
-		m.check()
-		m.start()
-	else:
+def coin_mining(coins='all', check_time=0.5):
+	if coins == 'all':
 		m = Miner(get_best_coin())
 		m.start()
 		m.check()
@@ -189,10 +185,24 @@ def coin_mining(coin='all', check_time=0.5):
 			if best_coin != m.get_coin():
 				m.set_coin(best_coin)
 				m.restart()
+	elif ',' in coins:
+		m = Miner(get_best_coin(coins))
+		m.start()
+		m.check()
+		while True:
+			sleep(int(check_time*3600))
+			best_coin = get_best_coin(coins)
+			if best_coin != m.get_coin():
+				m.set_coin(best_coin)
+				m.restart()
+	else:
+		m = Miner(coins)
+		m.check()
+		m.start()
+	
 			
 		
-
 if __name__ == "__main__":
-	coin_mining()
-	
+	my_coins = "ETC, ETC, ZCL, ZEC, KMD, XVG, HUSH"
+	coin_mining(my_coins)
 	
