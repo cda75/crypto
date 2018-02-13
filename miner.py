@@ -5,6 +5,7 @@ from datetime import datetime
 from subprocess import Popen, PIPE, CREATE_NEW_CONSOLE
 from ConfigParser import SafeConfigParser 
 import threading
+from time import sleep
 
 
 WORK_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -139,8 +140,10 @@ class Miner(object):
 
 	def check(self):
 		def run():
-			if not self.get_status():
-				self.restart()
+			while True:
+				if not self.get_status():
+					self.restart()
+				sleep(60)
 		thread = threading.Thread(target=run(), args=())
 		thread.daemon = True                         
 		thread.start()
