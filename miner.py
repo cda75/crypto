@@ -6,6 +6,7 @@ from subprocess import Popen, PIPE, CREATE_NEW_CONSOLE
 from ConfigParser import SafeConfigParser 
 import threading
 from time import sleep
+from multiprocessing import Process
 
 
 WORK_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -144,8 +145,8 @@ class Miner(object):
 				if not self.get_status():
 					self.restart()
 				sleep(60)
-		thread = threading.Thread(target=run(), args=())
-		thread.daemon = True                         
-		thread.start()
+		proc = Process(target=run)
+		proc.daemon = True                         
+		proc.start()
 		
 
