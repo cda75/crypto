@@ -149,16 +149,18 @@ class Miner(object):
 				if (not self.get_status()) and (self.__status == 'ON'):
 					self.restart()
 				sleep(60)
-		proc = Process(target=run)
+		proc = Process(name='background_process', target=run)
 		proc.daemon = True                         
 		proc.start()
 		
 
 if __name__ == "__main__":
 	coins = ['ZCL', 'ZEC', 'ETH', 'XVG']
+	m = Miner()
+	#m.check()
 	while True:
 		for coin in coins:
-			m = Miner(coin)
+			m.set_coin(coin)
 			m.start()
 			sleep(1800)
 			m.stop()
