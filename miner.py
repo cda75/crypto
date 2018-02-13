@@ -7,6 +7,7 @@ from subprocess import Popen, PIPE, CREATE_NEW_CONSOLE
 from ConfigParser import SafeConfigParser 
 import threading
 from time import sleep
+from operator import itemgetter
 
 
 WORK_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -166,8 +167,7 @@ def get_best_coin(coins='all'):
 		for value in reqResult.values():
 			if value['tag'] in MY_COINS:
 				best_dict[value['tag']] = value['profitability']
-		print rez
-		rez = sorted(best_dict.items(), key=operator.itemgetter(1), reverse=True)
+		rez = sorted(best_dict.items(), key=itemgetter(1), reverse=True)
 		return rez[0][0]
 	except:
 		print "[-] Error getting data from WhatToMine....Mining default coin"
