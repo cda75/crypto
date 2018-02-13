@@ -168,7 +168,9 @@ def get_best_coin(coins='all'):
 			if value['tag'] in MY_COINS:
 				best_dict[value['tag']] = value['profitability']
 		rez = sorted(best_dict.items(), key=itemgetter(1), reverse=True)
-		return rez[0][0]
+		best_coin = rez[0][0]
+		print "[i] Current best coin is %s" %best_coin
+		return best_coin
 	except:
 		print "[-] Error getting data from WhatToMine....Mining default coin"
 		return 'ZEC'
