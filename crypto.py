@@ -340,7 +340,7 @@ class Checker(object):
 
 if __name__ == "__main__":
 	while True:
-		coin_mining(t1=30, t2=0.5, coins='XVG')
+		#coin_mining(t1=30, t2=0.5, coins='XVG')
 		coin_mining(t2=24, coins='ETH, ETC, XVG, KMD, HASH, ZCL, ZEC')
 		nicehash_mining(t2=4, ADDR='1B1oMEyYkA7fPh8M5EWCnevUXWsATN33Vv')
 

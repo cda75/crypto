@@ -22,8 +22,10 @@ class Miner(object):
 		self.log = log
 		self.__equihash_bin = 'dtsm'
 
+
 	def __set_parameters(self, coin):
 		self.__coin = coin
+		self.__status = 'OFF'
 		cfg = SafeConfigParser()
 		cfg.read(COINS)
 		self.__algo = cfg.get(coin, 'ALGO')
@@ -112,6 +114,7 @@ class Miner(object):
 			self.__logging("[+] Successfully started %s mining\n" %self.__coin)
 			self.__write_coin()
 			self.__write_pid()
+			self.__status = 'ON'
 		except:
 			self.__logging("[-] ERROR started %s mining\nExit\n" %self.__coin)
 			exit()
@@ -123,6 +126,7 @@ class Miner(object):
 				os.system(cmdStr)
 				self.__pid = []
 				self.__write_pid()
+				self.__status = 'OFF'
 			except:
 				self.__logging("[-] Error stopping process\n" %pid)
 
@@ -141,7 +145,7 @@ class Miner(object):
 	def check(self):
 		def run():
 			while True:
-				if not self.get_status():
+				if (not self.get_status()) and (self.__status == 'ON'):
 					self.restart()
 				sleep(60)
 		thread = threading.Thread(target=run(), args=())
@@ -149,3 +153,11 @@ class Miner(object):
 		thread.start()
 		
 
+if __name__ == "__main__":
+	coins = ['ZCL', 'ZEC', 'ETH', 'XVG']
+	while True:
+		for coin in coins:
+			m = Miner(coin)
+			m.start()
+			sleep(1800)
+			m.stop()
