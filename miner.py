@@ -2,12 +2,9 @@
 
 import os
 from datetime import datetime
-from time import sleep
 from subprocess import Popen, PIPE, CREATE_NEW_CONSOLE
-import psutil
 from ConfigParser import SafeConfigParser 
 import threading
-
 
 
 WORK_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -77,7 +74,18 @@ class Miner(object):
 		if self.log:
 			with open(LOG, 'a') as f:
 				f.write(time+info+'\n')	
-		
+	
+	def __write_pid(self):
+		with open(PID, 'w') as f:
+			for pid in self.__pid:
+				f.write(pid+'\n')
+
+	def __write_coin(self):
+		coins = self.__coin.split()
+		with open(COIN, 'w') as f:
+			for coin in coins:
+				f.write(coin+'\n')
+
 	def start(self):
 		cmdStr = []
 		if self.__algo == 'equihash':
@@ -101,6 +109,8 @@ class Miner(object):
 			for cmd in cmdStr:
 				Popen(cmd, creationflags=CREATE_NEW_CONSOLE)
 			self.__logging("[+] Successfully started %s mining\n" %self.__coin)
+			self.__write_coin()
+			self.__write_pid()
 		except:
 			self.__logging("[-] ERROR started %s mining\nExit\n" %self.__coin)
 			exit()
@@ -110,14 +120,29 @@ class Miner(object):
 			cmdStr = "taskkill /f /im %s" %(pid)
 			try:	
 				os.system(cmdStr)
+				self.__pid = []
+				self.__write_pid()
 			except:
 				self.__logging("[-] Error stopping process\n" %pid)
 
 	def restart(self):
+		coin = self.__coin.split()[0]
 		self.stop()
+		self.__set_parameters(coin)
 		self.start()
 
+	def get_status(self):
+		for pid in self.__pid:
+			if pid not in Popen('tasklist', stdout=PIPE).communicate()[0]:
+				return False
+		return True
 
 	def check(self):
-		pass
+		def run():
+			if not self.get_status():
+				self.restart()
+		thread = threading.Thread(target=run(), args=())
+		thread.daemon = True                         
+		thread.start()
+		
 

@@ -56,7 +56,6 @@ def balance():
 	total_btc = 0
 	for coin in MY_COINS:
 		coin_value = get_coin_balance(coin)
-		print coin, coin_value
 		usd_price, rub_price, btc_price = get_coin_price(coin)
 		usd_value = usd_price * coin_value
 		rub_value = rub_price * coin_value
