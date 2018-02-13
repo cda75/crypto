@@ -6,7 +6,6 @@ from subprocess import Popen, PIPE, CREATE_NEW_CONSOLE
 from ConfigParser import SafeConfigParser 
 import threading
 from time import sleep
-from multiprocessing import Process
 
 
 WORK_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -25,6 +24,7 @@ class Miner(object):
 
 	def __set_parameters(self, coin):
 		self.__coin = coin
+		self.__status = "OFF"
 		cfg = SafeConfigParser()
 		cfg.read(COINS)
 		self.__algo = cfg.get(coin, 'ALGO')
@@ -113,6 +113,7 @@ class Miner(object):
 			self.__logging("[+] Successfully started %s mining\n" %self.__coin)
 			self.__write_coin()
 			self.__write_pid()
+			self.__status = "ON"
 		except:
 			self.__logging("[-] ERROR started %s mining\nExit\n" %self.__coin)
 			exit()
@@ -124,8 +125,10 @@ class Miner(object):
 				os.system(cmdStr)
 				self.__pid = []
 				self.__write_pid()
+				self.__status = "OFF"
+				self.__logging("[+] Successfully stoped curent process\n")
 			except:
-				self.__logging("[-] Error stopping process\n" %pid)
+				self.__logging("[-] Error stoping process\n" %pid)
 
 	def restart(self):
 		coin = self.__coin.split()[0]
@@ -133,20 +136,20 @@ class Miner(object):
 		self.__set_parameters(coin)
 		self.start()
 
-	def get_status(self):
+	def __pid_started(self):
 		for pid in self.__pid:
 			if pid not in Popen('tasklist', stdout=PIPE).communicate()[0]:
 				return False
 		return True
 
 	def check(self):
-		def run():
+		def check_thread():
 			while True:
-				if not self.get_status():
+				if not __pid_started():
 					self.restart()
 				sleep(60)
-		proc = Process(target=run)
-		proc.daemon = True                         
-		proc.start()
+		thread = threading.Thread(target=check_thread)   
+		thread.daemon = True                     
+		thread.start()
 		
 
