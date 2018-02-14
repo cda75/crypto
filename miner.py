@@ -207,5 +207,5 @@ def coin_mining(coins='all', check_time=0.5):
 			
 		
 if __name__ == "__main__":
-	coin_mining()
+	coin_mining('ETH, KMD')
 	
