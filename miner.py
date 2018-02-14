@@ -209,7 +209,6 @@ def get_best_coin(coins='all'):
 
 def coin_mining(coins='all', check_time=0.5):
 	m = Miner()
-	m.check()
 	if (coins == 'all') or (',' in coins):
 		best_coin = get_best_coin(coins=coins)
 		m.set_coin(best_coin)
@@ -229,11 +228,6 @@ def coin_mining(coins='all', check_time=0.5):
 			
 		
 if __name__ == "__main__":
-<<<<<<< HEAD
-	coin_mining('ZCL, ETH, ETC, XVG')
-=======
-	m = Miner()
-	print m.get_coins()
+	coin_mining('ZCL')
 
->>>>>>> fb14146220c3a6519140040b21674956fbe1a6e2
 	
