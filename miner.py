@@ -16,6 +16,16 @@ COINS = os.path.join(WORK_DIR, 'coins.conf')
 LOG = os.path.join(WORK_DIR, 'mining.log')
 PID = os.path.join(WORK_DIR, 'PID')
 COIN = os.path.join(WORK_DIR, 'COIN')
+LOGGING = "NO"
+
+
+
+def logging(info):
+	time = "[%s] " %datetime.strftime(datetime.now(), "%d/%m %H:%M:%S")
+	print time+info
+	if LOGGING == "YES":
+		with open('nicehash.log', 'a') as f:
+			f.write(time+info+'\n')
 
 
 class Miner(object):
@@ -94,20 +104,21 @@ class Miner(object):
 			else:
 				cmdStr.append("%s --server %s --port %s --user %s.%s --telemetry=0.0.0.0:42000" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
 		elif self.__algo == 'ethash':
-			cmdStr.append("%s -di 023 -epool %s:%s -ewal %s.%s " %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
-			eth_pid = self.__pid[0]
 			self.__set_parameters('ZEC')
+			zec_pid = self.__pid[0]
 			if self.__equihash_bin == 'ewbf':
 				cmdStr.append("%s --server %s --cuda_devices 1 --port %s --user %s.%s --api 0.0.0.0:42000 --fee 0" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
 			else:
 				cmdStr.append("%s --server %s --dev 1 --port %s --user %s.%s --telemetry=0.0.0.0:42000" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
-			self.__pid.append(eth_pid)
-			self.__coin = 'ETH'
+			self.__set_parameters('ETH')
+			cmdStr.append("%s -di 023 -epool %s:%s -ewal %s.%s " %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
+			self.__pid.append(zec_pid)
 		else:
 			cmdStr.append("%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(self.__bin, self.__algo, self.__pool, self.__port, self.__user, self.__worker))
 		try:
 			for cmd in cmdStr:
-				Popen(cmd, creationflags=CREATE_NEW_CONSOLE)
+				process = Popen(cmd, creationflags=CREATE_NEW_CONSOLE)
+				process.wait()
 			self.__logging("[+] Successfully started %s mining\n" %self.__coin)
 			self.__write_coin()
 			self.__write_pid()
@@ -121,12 +132,12 @@ class Miner(object):
 			cmdStr = "taskkill /f /im %s" %(pid)
 			try:	
 				os.system(cmdStr)
-				self.__pid = []
-				self.__write_pid()
-				self.__status = "OFF"
 				self.__logging("[+] Successfully stoped curent process\n")
 			except:
 				self.__logging("[-] Error stoping process\n" %pid)
+		self.__pid = []
+		self.__write_pid()
+		self.__status = "OFF"
 
 	def restart(self):
 		coin = self.__coin
@@ -161,7 +172,7 @@ def get_best_coin(coins='all'):
 		cfg.read(COINS)
 		MY_COINS = cfg.sections()
 	try:
-		print "[i] Checking best coin..."
+		logging("[i] Checking best coin...")
 		req = requests.get(JSON_URL)
 		reqResult = req.json()['coins']
 		best_dict = {}
@@ -170,37 +181,28 @@ def get_best_coin(coins='all'):
 				best_dict[value['tag']] = value['profitability']
 		rez = sorted(best_dict.items(), key=itemgetter(1), reverse=True)
 		best_coin = rez[0][0]
-		print "[i] Current best coin is %s" %best_coin
+		logging("[i] Current best coin is %s" %best_coin)
 		return best_coin
 	except:
-		print "[-] Error getting data from WhatToMine....Mining default coin"
+		logging("[-] Error getting data from WhatToMine....Mining default coin")
 		return 'ZEC'
 
 
 def coin_mining(coins='all', check_time=0.5):
-	if coins == 'all':
-		m = Miner(get_best_coin())
+	m = Miner()
+	m.check()
+	if (coins == 'all') or (',' in coins):
+		best_coin = get_best_coin(coins=coins)
+		m.set_coin(best_coin)
 		m.start()
-		m.check()
 		while True:
-			sleep(int(check_time*3600))
-			best_coin = get_best_coin()
-			if best_coin != m.get_coin():
-				m.set_coin(best_coin)
-				m.restart()
-	elif ',' in coins:
-		m = Miner(get_best_coin(coins))
-		m.start()
-		m.check()
-		while True:
-			sleep(int(check_time*3600))
-			best_coin = get_best_coin(coins)
+			sleep(check_time*3600)
+			best_coin = get_best_coin(coins=coins)
 			if best_coin != m.get_coin():
 				m.set_coin(best_coin)
 				m.restart()
 	else:
-		m = Miner(coins)
-		m.check()
+		m.set_coin(coins)
 		m.start()
 	
 			
