@@ -16,7 +16,7 @@ COINS = os.path.join(WORK_DIR, 'coins.conf')
 LOG = os.path.join(WORK_DIR, 'mining.log')
 PID = os.path.join(WORK_DIR, 'PID')
 COIN = os.path.join(WORK_DIR, 'COIN')
-LOGGING = "NO"
+LOGGING = "NO" # YES/NO
 
 
 
@@ -24,7 +24,7 @@ def logging(info):
 	time = "[%s] " %datetime.strftime(datetime.now(), "%d/%m %H:%M:%S")
 	print time+info
 	if LOGGING == "YES":
-		with open('nicehash.log', 'a') as f:
+		with open(LOG, 'a') as f:
 			f.write(time+info+'\n')
 
 
@@ -46,9 +46,11 @@ class Miner(object):
 		self.__addr = cfg.get(coin, 'ADDR')
 		self.__worker = cfg.get(coin, 'WORKER')
 		self.__password = cfg.get(coin, 'PASSWORD')
+		self.__coins = cfg.sections()
 		cfg.read(CONFIG)
 		self.__bin = cfg.get('ALGO', self.__algo)
 		self.__pid = []
+		self.__cmd = dict()
 
 	def set_coin(self, coin):
 		self.__set_parameters(coin)
@@ -56,11 +58,11 @@ class Miner(object):
 	def get_coin(self):
 		return self.__coin
 
+	def get_coins(self):
+		return self.__coins
+
 	def get_algo(self):
 		return self.__algo
-
-	def get_pid(self):
-		return self.__pid
 
 	def get_pool(self):
 		return self.__pool
@@ -103,20 +105,23 @@ class Miner(object):
 			else:
 				cmdStr.append("%s --server %s --port %s --user %s.%s --telemetry=0.0.0.0:42000" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
 		elif self.__algo == 'ethash':
+			coin = self.__coin
 			self.__set_parameters('ZEC')
 			if self.__equihash_bin == 'ewbf':
 				cmdStr.append("%s --server %s --cuda_devices 1 --port %s --user %s.%s --api 0.0.0.0:42000 --fee 0" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
 			else:
 				cmdStr.append("%s --server %s --dev 1 --port %s --user %s.%s --telemetry=0.0.0.0:42000" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
-			self.__set_parameters('ETH')
+			self.__set_parameters(coin)
 			cmdStr.append("%s -di 023 -epool %s:%s -ewal %s.%s " %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
 		else:
 			cmdStr.append("%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(self.__bin, self.__algo, self.__pool, self.__port, self.__user, self.__worker))
 		try:
 			for cmd in cmdStr:
-				process = Popen(cmd, creationflags=CREATE_NEW_CONSOLE)
-				proc_bin = os.path.basename(cmd.split()[0])
-				self.__pid.append(proc_bin)
+				Popen(cmd, creationflags=CREATE_NEW_CONSOLE)
+				pid = os.path.basename(cmd.split()[0])
+				self.__pid.append(pid)
+				self.__cmd[pid] = cmd
+				self.__monitor_pid(pid)
 			self.__logging("[+] Successfully started %s mining\n" %self.__coin)
 			self.__write_coin()
 			self.__write_pid()
@@ -133,6 +138,7 @@ class Miner(object):
 			except:
 				self.__logging("[-] Error stoping process\n" %pid)
 		self.__pid = []
+		self.__cmd = {}
 		self.__write_pid()
 		self.__status = "OFF"
 
@@ -142,18 +148,33 @@ class Miner(object):
 		self.__set_parameters(coin)
 		self.start()
 
-	def __pid_started(self):
-		for pid in self.__pid:
-			if pid not in Popen('tasklist', stdout=PIPE).communicate()[0]:
-				return False
+	def __restart_pid(self, pid):
+		cmd = self.__cmd[pid]
+		Popen(cmd, creationflags=CREATE_NEW_CONSOLE)
+
+	def __pid_started(self, pid):
+		if pid not in Popen('tasklist', stdout=PIPE).communicate()[0]:
+			return False
 		return True
+
+	def __monitor_pid(self, pid):
+		def check_pid():
+			while True:
+				if not self.__pid_started(pid):
+					self.__logging("[i] Restarting process %s" %pid)
+					self.__restart_pid(pid)
+				sleep(60)
+		thread = threading.Thread(target=check_pid)   
+		thread.daemon = True                     
+		thread.start()
 
 	def check(self):
 		def check_thread():
 			while True:
-				if not self.__pid_started():
-					logging("[i] Restarting process %s" %self.__pid)
-					self.restart()
+				for pid in self.__pid:
+					if not self.__pid_started(pid):
+						self.__logging("[i] Restarting process %s" %pid)
+						self.restart()
 				sleep(60)
 		thread = threading.Thread(target=check_thread)   
 		thread.daemon = True                     
@@ -202,9 +223,17 @@ def coin_mining(coins='all', check_time=0.5):
 	else:
 		m.set_coin(coins)
 		m.start()
+		while True:
+			sleep(10000)
 	
 			
 		
 if __name__ == "__main__":
+<<<<<<< HEAD
 	coin_mining('ZCL, ETH, ETC, XVG')
+=======
+	m = Miner()
+	print m.get_coins()
+
+>>>>>>> fb14146220c3a6519140040b21674956fbe1a6e2
 	
