@@ -102,6 +102,7 @@ class Miner(object):
 			else:
 				cmdStr.append("%s --server %s --dev 1 --port %s --user %s.%s --telemetry=0.0.0.0:42000" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
 			self.__pid.append(eth_pid)
+			self.__coin = 'ETH'
 		else:
 			cmdStr.append("%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(self.__bin, self.__algo, self.__pool, self.__port, self.__user, self.__worker))
 		try:
@@ -203,6 +204,6 @@ def coin_mining(coins='all', check_time=0.5):
 			
 		
 if __name__ == "__main__":
-	my_coins = "ETC, ETC, ZCL, ZEC, KMD, XVG, HUSH"
-	coin_mining(my_coins)
+	my_coins = "ZCL, ZEC"
+	coin_mining('ETH')
 	
