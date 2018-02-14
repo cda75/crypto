@@ -126,7 +126,6 @@ class Miner(object):
 			self.__write_coin()
 			self.__write_pid()
 			self.__status = "ON"
-			print self.__cmd
 		except:
 			self.__logging("[-] ERROR started %s mining\nExit\n" %self.__coin)
 			exit()
@@ -155,6 +154,8 @@ class Miner(object):
 		try:
 			Popen(cmd, creationflags=CREATE_NEW_CONSOLE)
 			self.__logging("[+] Process Successfully restarted")
+		except:
+			self.__logging("[-] Process failed to start")
 
 	def __pid_started(self, pid):
 		if pid not in Popen('tasklist', stdout=PIPE).communicate()[0]:
@@ -232,6 +233,6 @@ def coin_mining(coins='all', check_time=0.5):
 			
 		
 if __name__ == "__main__":
-	coin_mining('ETH')
+	coin_mining('ETH, ZCL, ZEC, XVG, ETC')
 
 	
