@@ -34,7 +34,6 @@ class Miner(object):
 		self.log = log
 		self.__equihash_bin = 'dtsm'
 
-
 	def __set_parameters(self, coin):
 		self.__coin = coin
 		self.__status = 'OFF'
@@ -49,7 +48,7 @@ class Miner(object):
 		self.__password = cfg.get(coin, 'PASSWORD')
 		cfg.read(CONFIG)
 		self.__bin = cfg.get('ALGO', self.__algo)
-		self.__pid = [os.path.basename(self.__bin)]
+		self.__pid = []
 
 	def set_coin(self, coin):
 		self.__set_parameters(coin)
@@ -105,7 +104,6 @@ class Miner(object):
 				cmdStr.append("%s --server %s --port %s --user %s.%s --telemetry=0.0.0.0:42000" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
 		elif self.__algo == 'ethash':
 			self.__set_parameters('ZEC')
-			zec_pid = self.__pid[0]
 			if self.__equihash_bin == 'ewbf':
 				cmdStr.append("%s --server %s --cuda_devices 1 --port %s --user %s.%s --api 0.0.0.0:42000 --fee 0" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
 			else:
@@ -118,7 +116,8 @@ class Miner(object):
 		try:
 			for cmd in cmdStr:
 				process = Popen(cmd, creationflags=CREATE_NEW_CONSOLE)
-				process.wait()
+				proc_bin = os.path.basename(cmd.split()[0])
+				self.__pid.append(proc_bin)
 			self.__logging("[+] Successfully started %s mining\n" %self.__coin)
 			self.__write_coin()
 			self.__write_pid()
@@ -155,6 +154,7 @@ class Miner(object):
 		def check_thread():
 			while True:
 				if not self.__pid_started():
+					logging("[i] Restarting process %s" %self.__pid)
 					self.restart()
 				sleep(60)
 		thread = threading.Thread(target=check_thread)   
@@ -208,6 +208,5 @@ def coin_mining(coins='all', check_time=0.5):
 			
 		
 if __name__ == "__main__":
-	my_coins = "ZCL, ZEC"
-	coin_mining('ETH')
+	coin_mining()
 	
