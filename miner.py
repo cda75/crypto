@@ -126,6 +126,7 @@ class Miner(object):
 			self.__write_coin()
 			self.__write_pid()
 			self.__status = "ON"
+			print self.__cmd
 		except:
 			self.__logging("[-] ERROR started %s mining\nExit\n" %self.__coin)
 			exit()
@@ -138,7 +139,7 @@ class Miner(object):
 			except:
 				self.__logging("[-] Error stoping process\n" %pid)
 		self.__pid = []
-		self.__cmd = {}
+		self.__cmd = dict()
 		self.__write_pid()
 		self.__status = "OFF"
 
@@ -150,6 +151,7 @@ class Miner(object):
 
 	def __restart_pid(self, pid):
 		cmd = self.__cmd[pid]
+		self.__logging("[i] Trying to restart process %s ....." %pid)
 		Popen(cmd, creationflags=CREATE_NEW_CONSOLE)
 
 	def __pid_started(self, pid):
@@ -228,6 +230,6 @@ def coin_mining(coins='all', check_time=0.5):
 			
 		
 if __name__ == "__main__":
-	coin_mining('ZCL')
+	coin_mining('ETH')
 
 	
