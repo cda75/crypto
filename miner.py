@@ -173,17 +173,6 @@ class Miner(object):
 		thread.daemon = True                     
 		thread.start()
 
-	def check(self):
-		def check_thread():
-			while True:
-				for pid in self.__pid:
-					if not self.__pid_started(pid):
-						self.__logging("[i] Restarting process %s" %pid)
-						self.restart()
-				sleep(60)
-		thread = threading.Thread(target=check_thread)   
-		thread.daemon = True                     
-		thread.start()
 
 
 
@@ -233,6 +222,6 @@ def coin_mining(coins='all', check_time=0.5):
 			
 		
 if __name__ == "__main__":
-	coin_mining('ETH, ZCL, ZEC, XVG, ETC')
+	coin_mining('ETH, ZCL')
 
 	
