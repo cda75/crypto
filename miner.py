@@ -110,7 +110,6 @@ class Miner(object):
 				cmdStr.append("%s --server %s --dev 1 --port %s --user %s.%s --telemetry=0.0.0.0:42000" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
 			self.__set_parameters('ETH')
 			cmdStr.append("%s -di 023 -epool %s:%s -ewal %s.%s " %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
-			self.__pid.append(zec_pid)
 		else:
 			cmdStr.append("%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(self.__bin, self.__algo, self.__pool, self.__port, self.__user, self.__worker))
 		try:
