@@ -152,7 +152,9 @@ class Miner(object):
 	def __restart_pid(self, pid):
 		cmd = self.__cmd[pid]
 		self.__logging("[i] Trying to restart process %s ....." %pid)
-		Popen(cmd, creationflags=CREATE_NEW_CONSOLE)
+		try:
+			Popen(cmd, creationflags=CREATE_NEW_CONSOLE)
+			self.__logging("[+] Process Successfully restarted")
 
 	def __pid_started(self, pid):
 		if pid not in Popen('tasklist', stdout=PIPE).communicate()[0]:
@@ -163,7 +165,7 @@ class Miner(object):
 		def check_pid():
 			while True:
 				if not self.__pid_started(pid):
-					self.__logging("[i] Restarting process %s" %pid)
+					self.__logging("[-] Ooops! Process %s was crashed!!!" %pid)
 					self.__restart_pid(pid)
 				sleep(60)
 		thread = threading.Thread(target=check_pid)   
