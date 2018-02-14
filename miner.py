@@ -131,7 +131,6 @@ class Miner(object):
 			cmdStr = "taskkill /f /im %s" %(pid)
 			try:	
 				os.system(cmdStr)
-				self.__logging("[+] Successfully stoped curent process\n")
 			except:
 				self.__logging("[-] Error stoping process\n" %pid)
 		self.__pid = []
