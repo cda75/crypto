@@ -138,7 +138,7 @@ class Miner(object):
 			except:
 				self.__logging("[-] Error stoping process\n" %pid)
 		self.__pid = []
-		self.__cmd = dict()
+		self.__cmd = {}
 		self.__write_pid()
 		self.__status = "OFF"
 
@@ -201,7 +201,7 @@ def get_best_coin(coins='all'):
 		return 'ZEC'
 
 
-def coin_mining(coins='all', check_time=0.5):
+def coin_mining(coins='all', check_time=0.5, run_time=10000):
 	m = Miner()
 	if (coins == 'all') or (',' in coins):
 		best_coin = get_best_coin(coins=coins)
@@ -211,17 +211,19 @@ def coin_mining(coins='all', check_time=0.5):
 			sleep(check_time*3600)
 			best_coin = get_best_coin(coins=coins)
 			if best_coin != m.get_coin():
+				m.stop()
 				m.set_coin(best_coin)
-				m.restart()
+				m.start()
 	else:
 		m.set_coin(coins)
 		m.start()
-		while True:
-			sleep(10000)
+		sleep(run_time*3600)
+		m.stop()
 	
 			
 		
 if __name__ == "__main__":
-	coin_mining('ETH, ZCL')
+	coin_mining('ETH', run_time=1)
+	coin_mining()
 
 	
