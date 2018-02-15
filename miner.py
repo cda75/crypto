@@ -226,8 +226,11 @@ def coin_mining(coins='all', check_time=0.5, run_time=100):
 		
 if __name__ == "__main__":
 	while  True:
-		coin_mining('ETH', run_time=0.5)
-		coin_mining(run_time=6)
+		coin_mining('ETH', run_time=1)
+		coin_mining('XVG', run_time=0.5)
+		coin_mining('ETH,ETC,ZEC,ZCL,KMD,XVG', run_time=8)
+		coin_mining('XVG', run_time=0.5)
+		coin_mining(run_time=8)
 		
 
 
