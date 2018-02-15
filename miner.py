@@ -8,7 +8,6 @@ from ConfigParser import SafeConfigParser
 import threading
 from time import sleep
 from operator import itemgetter
-import sys
 
 
 WORK_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -31,13 +30,15 @@ def logging(info):
 
 class Miner(object):
 	def __init__(self, coin='ZEC', log=False):
-		self.__set_parameters(coin)
-		self.log = log
+		self.set_coin(coin)
+		self.__log = log
 		self.__equihash_bin = 'dtsm'
 
-	def __set_parameters(self, coin):
+	def set_coin(self, coin):
 		self.__coin = coin
 		self.__status = 'OFF'
+		self.__pid = []
+		self.__cmd = dict()
 		cfg = SafeConfigParser()
 		cfg.read(COINS)
 		self.__algo = cfg.get(coin, 'ALGO')
@@ -50,42 +51,34 @@ class Miner(object):
 		self.__coins = cfg.sections()
 		cfg.read(CONFIG)
 		self.__bin = cfg.get('ALGO', self.__algo)
-		self.__pid = []
-		self.__cmd = dict()
-
-	def set_coin(self, coin):
-		self.__set_parameters(coin)
-
+		
 	def get_coin(self):
 		return self.__coin
 
-	def get_coins(self):
-		return self.__coins
-
-	def get_algo(self):
+	def get_coin_algo(self):
 		return self.__algo
 
-	def get_pool(self):
+	def get_coin_pool(self):
 		return self.__pool
 
-	def get_bin(self):
+	def get_coin_bin(self):
 		return self.__bin
 
-	def get_addr(self):
+	def get_coin_addr(self):
 		return self.__addr
 
-	def set_equihash_bin(self, prog_bin):
-		self.__equihash_bin = prog_bin
+	def set_equihash_bin(self, algo_bin):
+		self.__equihash_bin = algo_bin
 		if self.__algo == 'equihash':
 			cfg = SafeConfigParser()
 			cfg.read(CONFIG)
-			self.__bin = cfg.get('ALGO', prog_bin.lower())
+			self.__bin = cfg.get('ALGO', algo_bin.lower())
 			self.__pid = [os.path.basename(self.__bin)]
 
 	def __logging(self, info):
 		time = "[%s] " %datetime.strftime(datetime.now(), "%d/%m %H:%M:%S")
 		print time+info
-		if self.log:
+		if self.__log:
 			with open(LOG, 'a') as f:
 				f.write(time+info+'\n')	
 	
@@ -101,48 +94,41 @@ class Miner(object):
 	def start(self):
 		cmdStr = []
 		if self.__algo == 'equihash':
-			if self.__equihash_bin == 'ewbf':
-				cmdStr.append("%s --server %s --port %s --user %s.%s --api 0.0.0.0:42000 --fee 0" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
-			else:
-				cmdStr.append("%s --server %s --port %s --user %s.%s --telemetry=0.0.0.0:42000" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
+			cmdStr.append("%s --server %s --port %s --user %s.%s" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
 		elif self.__algo == 'ethash':
 			coin = self.__coin
-			self.__set_parameters('ZEC')
+			self.set_coin('ZEC')
 			if self.__equihash_bin == 'ewbf':
 				cmdStr.append("%s --server %s --cuda_devices 1 --port %s --user %s.%s --api 0.0.0.0:42000 --fee 0" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
 			else:
 				cmdStr.append("%s --server %s --dev 1 --port %s --user %s.%s --telemetry=0.0.0.0:42000" %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
-			self.__set_parameters(coin)
+			self.set_coin(coin)
 			cmdStr.append("%s -di 023 -epool %s:%s -ewal %s.%s " %(self.__bin, self.__pool, self.__port, self.__user, self.__worker))
 		else:
 			cmdStr.append("%s -a %s -o %s:%s -u %s.%s --cpu-priority=3" %(self.__bin, self.__algo, self.__pool, self.__port, self.__user, self.__worker))
-		try:
-			for cmd in cmdStr:
+		for cmd in cmdStr:
+			try:
 				Popen(cmd, creationflags=CREATE_NEW_CONSOLE)
 				pid = os.path.basename(cmd.split()[0])
 				self.__pid.append(pid)
 				self.__cmd[pid] = cmd
-#				self.__threads.append(self.__monitor_pid(pid))
-			self.__logging("[+] Successfully started %s mining\n" %self.__coin)
-			self.__write_coin()
-			self.__write_pid()
-			self.__status = "ON"
-			self.__monitor_pid()
-		except:
-			self.__logging("[-] ERROR started %s mining\nExit\n" %self.__coin)
-			self.__logging(sys.exc_info())
-			#exit()
+				self.__logging("[+] Successfully started %s mining\n" %self.__coin)
+				self.__write_coin()
+				self.__write_pid()
+				self.__status = "ON"	
+			except:
+				self.__logging("[-] ERROR started %s mining\nExit\n" %self.__coin)
+		self.__monitor()
 
 	def stop(self):
 		for pid in self.__pid:
 			cmdStr = "taskkill /f /im %s" %(pid)
-			try:	
-				os.system(cmdStr)
-			except:
-				self.__logging("[-] Error stoping process\n" %pid)
+			os.system(cmdStr)
 		self.__pid = []
 		self.__cmd = {}
 		self.__write_pid()
+		self.__coin = ''
+		self.__write_coin()
 		self.__status = "OFF"
 
 	def __restart_pid(self, pid):
@@ -154,18 +140,18 @@ class Miner(object):
 		except:
 			self.__logging("[-] Process failed to start")
 
-	def __pid_started(self, pid):
-		if pid not in Popen('tasklist', stdout=PIPE).communicate()[0]:
-			return False
-		return True
-
-	def __monitor_pid(self):
+	def __monitor(self):
+		def pid_started(self, pid):
+			if pid not in Popen('tasklist', stdout=PIPE).communicate()[0]:
+				return False
+			return True
 		def run():
 			while True:
-				for pid in self.__pid:
-					if not self.__pid_started(pid):
-						self.__logging("[-] Ooops! Process %s was crashed!!!" %pid)
-						self.__restart_pid(pid)
+				if self.__status == 'ON':
+					for pid in self.__pid:
+						if not pid_started(pid):
+							self.__logging("[-] Ooops! Process %s was crashed!!!" %pid)
+							self.__restart_pid(pid)
 				sleep(60)
 		thread = threading.Thread(target=run, args=())   
 		thread.daemon = True                     
@@ -216,9 +202,7 @@ def coin_mining(coins='all', check_time=0.5, run_time=100):
 		m.set_coin(coins)
 		m.start()
 		sleep(run_time*3600)
-		logging("[i] Stoping curent processes....")
-		m.stop()
-	print "Stopping ..."
+	logging("[i] Stoping current process .....")
 	m.stop()
 
 	
@@ -226,11 +210,11 @@ def coin_mining(coins='all', check_time=0.5, run_time=100):
 		
 if __name__ == "__main__":
 	while  True:
-		coin_mining('ETH', run_time=1)
-		coin_mining('XVG', run_time=0.5)
 		coin_mining('ETH,ETC,ZEC,ZCL,KMD,XVG', run_time=8)
-		coin_mining('XVG', run_time=0.5)
+		coin_mining('ETH', run_time=1)
 		coin_mining(run_time=8)
+		coin_mining('XVG', run_time=0.5)
+		
 		
 
 
