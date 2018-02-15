@@ -218,12 +218,13 @@ def coin_mining(coins='all', check_time=0.5, run_time=10000):
 		m.set_coin(coins)
 		m.start()
 		sleep(run_time*3600)
+		logging("[i] Stoping curent processes....")
 		m.stop()
 	
 			
 		
 if __name__ == "__main__":
-	coin_mining('ETH', run_time=1)
-	coin_mining()
+	coin_mining('ETH', run_time=0.1)
+	#coin_mining()
 
 	
