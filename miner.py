@@ -8,6 +8,7 @@ from ConfigParser import SafeConfigParser
 import threading
 from time import sleep
 from operator import itemgetter
+import sys
 
 
 WORK_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -121,14 +122,16 @@ class Miner(object):
 				pid = os.path.basename(cmd.split()[0])
 				self.__pid.append(pid)
 				self.__cmd[pid] = cmd
-				self.__monitor_pid(pid)
+#				self.__threads.append(self.__monitor_pid(pid))
 			self.__logging("[+] Successfully started %s mining\n" %self.__coin)
 			self.__write_coin()
 			self.__write_pid()
 			self.__status = "ON"
+			self.__monitor_pid()
 		except:
 			self.__logging("[-] ERROR started %s mining\nExit\n" %self.__coin)
-			exit()
+			self.__logging(sys.exc_info())
+			#exit()
 
 	def stop(self):
 		for pid in self.__pid:
@@ -141,12 +144,6 @@ class Miner(object):
 		self.__cmd = {}
 		self.__write_pid()
 		self.__status = "OFF"
-
-	def restart(self):
-		coin = self.__coin
-		self.stop()
-		self.__set_parameters(coin)
-		self.start()
 
 	def __restart_pid(self, pid):
 		cmd = self.__cmd[pid]
@@ -162,17 +159,17 @@ class Miner(object):
 			return False
 		return True
 
-	def __monitor_pid(self, pid):
-		def check_pid():
+	def __monitor_pid(self):
+		def run():
 			while True:
-				if not self.__pid_started(pid):
-					self.__logging("[-] Ooops! Process %s was crashed!!!" %pid)
-					self.__restart_pid(pid)
+				for pid in self.__pid:
+					if not self.__pid_started(pid):
+						self.__logging("[-] Ooops! Process %s was crashed!!!" %pid)
+						self.__restart_pid(pid)
 				sleep(60)
-		thread = threading.Thread(target=check_pid)   
+		thread = threading.Thread(target=run, args=())   
 		thread.daemon = True                     
 		thread.start()
-
 
 
 
@@ -201,29 +198,34 @@ def get_best_coin(coins='all'):
 		return 'ZEC'
 
 
-def coin_mining(coins='all', check_time=0.5, run_time=10000):
+def coin_mining(coins='all', check_time=0.5, run_time=100):
 	m = Miner()
 	if (coins == 'all') or (',' in coins):
 		best_coin = get_best_coin(coins=coins)
 		m.set_coin(best_coin)
 		m.start()
-		while True:
+		while run_time > 0:
 			sleep(check_time*3600)
 			best_coin = get_best_coin(coins=coins)
 			if best_coin != m.get_coin():
 				m.stop()
 				m.set_coin(best_coin)
 				m.start()
+			run_time -= check_time
 	else:
 		m.set_coin(coins)
 		m.start()
 		sleep(run_time*3600)
-		m.stop()
+	print "Stopping ..."
+	m.stop()
 	
 			
 		
 if __name__ == "__main__":
-	coin_mining('ETH', run_time=1)
-	coin_mining()
+	while  True:
+		coin_mining('ETH', run_time=0.5)
+		coin_mining(run_time=6)
+		
+
 
 	
