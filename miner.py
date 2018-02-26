@@ -141,7 +141,7 @@ class Miner(object):
 			self.__logging("[-] Process failed to start")
 
 	def __monitor(self):
-		def pid_started(self, pid):
+		def pid_started(pid):
 			if pid not in Popen('tasklist', stdout=PIPE).communicate()[0]:
 				return False
 			return True
@@ -210,18 +210,10 @@ def coin_mining(coins='all', check_time=0.5, run_time=100):
 		
 if __name__ == "__main__":
 	while  True:
-<<<<<<< HEAD
+		coin_mining('ETC', run_time=2)
+		coin_mining('ETH,ETC,ZEC,ZCL,KMD,XVG', run_time=12)
 		coin_mining('ETH', run_time=2)
-		coin_mining(run_time=6)
-=======
-		coin_mining('ETH,ETC,ZEC,ZCL,KMD,XVG', run_time=8)
-		coin_mining('ETH', run_time=1)
 		coin_mining(run_time=8)
-		coin_mining('XVG', run_time=0.5)
->>>>>>> 98d41a339721fc8f0cd3b993801990176ae4a793
-		
-		
-
-
-
 	
+		
+		
