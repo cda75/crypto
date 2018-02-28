@@ -144,10 +144,10 @@ def get_coin_price(coin):
 class BalanceData(object):
 	def __init__(self, interval=3600):
 		self.interval = interval
-		self.COINS = ['ZEC','BTC','ETH','XVG']
+		self.COINS = ['ZEC','BTC','ETH','ETC','XVG']
 		self.API = os.path.join(WORK_DIR, 'api.conf')
 		self.BALANCE = os.path.join(WORK_DIR, 'balance.csv')
-		thread = threading.Thread(target=self.run, args=())
+		thread = threading.Thread(target=self.run)
 		thread.daemon = True                         
 		thread.start()
 	def run(self):
@@ -162,11 +162,11 @@ class BalanceData(object):
 				req = requests.get(url, verify=False)
 				if coin == "BTC":
 					value = float(req.json())/10**8
-				elif coin == 'ZEC':
+				elif coin in ["ZEC", "ETC"]:
 					value = float(req.json()['balance'])
-				elif coin in ["ETH", "ETC"]:
+				elif coin == "ETH":
 					value = float(req.json()['balance'])/10**18
-				elif coin == 'XVG':
+				elif coin == "XVG":
 					value = float(req.json())		
 				for line in lines:
 					if line[0] == coin:
